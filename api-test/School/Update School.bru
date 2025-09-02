@@ -1,0 +1,15 @@
+meta {
+  name: Update School
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{host}}/api/v1/schools/6
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {"name": "Sixth Sense School"}
+}

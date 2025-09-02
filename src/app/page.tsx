@@ -1,103 +1,261 @@
-import Image from "next/image";
+'use client'
+
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent } from "@/components/ui/popover";
+import { PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { School } from "@/types";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
+// const schools: School[] = [
+//   { id: "1", name: "Greenwood High School" },
+//   { id: "2", name: "Riverdale Academy" },
+//   { id: "3", name: "Sunrise Public School" },
+//   { id: "4", name: "Hilltop International" },
+//   { id: "5", name: "Maple Leaf School" },
+// ];
+const gradeLevels = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, label: i + 1 }));
+const classChar = [
+  { id: "a", label: "A" },
+  { id: "b", label: "B" },
+  { id: "c", label: "C" },
+  { id: "d", label: "D" },
+  { id: "e", label: "E" },
+  { id: "f", label: "F" },
+];
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [openSchool, setOpenSchool] = React.useState(false);
+  const [openGrade, setOpenGrade] = React.useState(false);
+  const [openClass, setOpenClass] = React.useState(false);
+  const [schoolName, setSchoolName] = React.useState<string | null>(null);
+  const [gradeLevel, setGradeLevel] = React.useState<number | null>(null);
+  const [classSection, setClassSection] = React.useState<string | null>(null);
+  const [schools, setSchools] = React.useState<School[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+  const isSelectionValid = schoolName !== null && gradeLevel !== null && classSection !== null;
+
+  React.useEffect(() => {
+    fetch('/api/v1/schools')
+      .then((res) => res.json())
+      .then((data) => {
+        // Handle the fetched school data
+        setSchools(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching schools:', error);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    if (classSection) {
+      const userIdKey = "homework_user_id";
+      let userId = localStorage.getItem(userIdKey);
+      if (!userId) {
+        // Use a fallback for crypto.randomUUID() for Safari/iOS
+        const generateUUID = () => {
+          if (window.crypto && (window.crypto.randomUUID as any)) {
+            return window.crypto.randomUUID();
+          }
+          // Fallback UUID v4 generator
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+        };
+        userId = generateUUID();
+        localStorage.setItem(userIdKey, userId);
+      }
+    }
+  }, [classSection]);
+
+  React.useEffect(() => {
+    if (schoolName && gradeLevel && classSection) {
+      localStorage.setItem("selected_school", schoolName);
+      localStorage.setItem("selected_grade", gradeLevel.toString());
+      localStorage.setItem("selected_class", classSection);
+    }
+  }, [schoolName, gradeLevel, classSection]);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSchoolName(localStorage.getItem("selected_school"));
+      setGradeLevel(
+        localStorage.getItem("selected_grade")
+          ? Number(localStorage.getItem("selected_grade"))
+          : null
+      );
+      setClassSection(localStorage.getItem("selected_class"));
+    }
+  }, []);
+
+  return (
+    <div className="md:h-full flex flex-col mt-10 justify-center items-center overflow-hidden gap-10">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-10 w-full max-w-2xl md:justify-center">
+        <Popover open={openSchool} onOpenChange={setOpenSchool}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={openSchool}
+              className="w-full md:w-[200px] justify-between"
+            >
+              {schoolName
+                ? schools.find((sch) => sch.name === schoolName)?.name
+                : "Select School..."}
+              <ChevronsUpDown className="opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full md:w-fit p-0">
+            <Command>
+              <CommandInput placeholder="Search school..." className="h-9" />
+              <CommandList>
+                <CommandEmpty>No school found.</CommandEmpty>
+                <CommandGroup>
+                  {schools.map((sch) => (
+                    <CommandItem
+                      key={sch.id}
+                      value={sch.name}
+                      onSelect={(currentSchool) => {
+                        setSchoolName(currentSchool)
+                        setOpenSchool(false)
+                      }}
+                    >
+                      {sch.name}
+                      <Check
+                        className={cn(
+                          "ml-auto",
+                          schoolName === sch.name ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        <Popover open={openGrade} onOpenChange={setOpenGrade}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={openGrade}
+              className="w-full md:w-fit justify-between"
+              disabled={!schoolName}
+            >
+              {gradeLevel
+                ? `Grade ${gradeLevel}`
+                : "Select Grade..."}
+              <ChevronsUpDown className="opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full md:w-fit p-0">
+            <Command>
+              <CommandInput placeholder="Search grade..." className="h-9" />
+              <CommandList>
+                <CommandEmpty>No grade found.</CommandEmpty>
+                <CommandGroup>
+                  {gradeLevels.map((grade) => (
+                    <CommandItem
+                      key={grade.id}
+                      value={grade.label.toString()}
+                      onSelect={() => {
+                        setGradeLevel(grade.id);
+                        setOpenGrade(false);
+                      }}
+                    >
+                      {`Grade ${grade.label}`}
+                      <Check
+                        className={cn(
+                          "ml-auto",
+                          gradeLevel === grade.label ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        <Popover open={openClass} onOpenChange={setOpenClass}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={openClass}
+              className="w-full md:w-fit justify-between"
+              disabled={!gradeLevel}
+            >
+              {classSection
+                ? `Class ${classChar.find((c) => c.id === classSection)?.label}`
+                : "Select Class..."}
+              <ChevronsUpDown className="opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full md:w-fit p-0">
+            <Command>
+              <CommandInput placeholder="Search class..." className="h-9" />
+              <CommandList>
+                <CommandEmpty>No class found.</CommandEmpty>
+                <CommandGroup>
+                  {classChar.map((section) => (
+                    <CommandItem
+                      key={section.id}
+                      value={section.label}
+                      onSelect={() => {
+                        setClassSection(section.id);
+                        setOpenClass(false);
+                      }}
+                    >
+                      {`Class ${section.label}`}
+                      <Check
+                        className={cn(
+                          "ml-auto",
+                          classSection === section.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div className="flex flex-col md:flex-row gap-6 md:gap-10 w-full max-w-2xl md:justify-center">
+        <Button variant="default" className="w-full md:w-fit">
+          <span
+            onClick={() => {
+              if (!isSelectionValid) {
+                toast.warning("All fields are required!");
+                return;
+              }
+              window.location.href = "/homework/create";
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Enter HomeWork
+          </span>
+        </Button>
+        <Button asChild variant="default" className="w-full md:w-fit">
+          <span
+            onClick={() => {
+              if (!isSelectionValid) {
+                toast.warning("All fields are required!");
+                return;
+              }
+              window.location.href = "/homework/search";
+            }}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            Lookup HomeWork
+          </span>
+        </Button>
+      </div>
     </div>
   );
 }

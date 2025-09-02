@@ -1,0 +1,23 @@
+meta {
+  name: Create HomeWork
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/api/v1/homeworks
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 6,
+    "content": "Algebra exercises",
+    "gpt_reasoning": "Relevant to curriculum",
+    "subject": "Math",
+    "user_id": "user1",
+    "delivery_date": "2024-06-10",
+    "gpt_status": "approved"
+  }
+}

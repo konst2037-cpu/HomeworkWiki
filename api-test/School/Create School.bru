@@ -1,0 +1,18 @@
+meta {
+  name: Create School
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/api/v1/schools
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 6,
+    "name": "Sixth School"
+  }
+}

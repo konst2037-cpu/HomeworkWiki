@@ -1,0 +1,15 @@
+meta {
+  name: Update HomeWork
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/api/v1/homeworks/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {"subject": "Math"}
+}
