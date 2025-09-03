@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from fastapi import APIRouter, Depends, Query
 from sqlmodel import select
 
@@ -13,9 +11,25 @@ router = APIRouter(prefix="/v1", tags=["homework"])
 def read_homeworks(
     session: SessionDep = Depends(SessionDep),
     offset: int = 0,
-    limit: Annotated[int, Query(le=100)] = 10,
+    limit: int = Query(default=None, le=100),
+    delivery_date: str | None = Query(default=None),
+    school_id: int | None = Query(default=None),
+    grade_id: int | None = Query(default=None),
+    class_id: int | None = Query(default=None),
 ):
-    return session.exec(select(Homework).offset(offset).limit(limit)).all()
+    query = select(Homework).offset(offset)
+    if limit:
+        query = query.limit(limit)
+    filters = [
+        (Homework.delivery_date == delivery_date) if delivery_date else None,
+        (Homework.school_id == school_id) if school_id else None,
+        (Homework.grade_id == grade_id) if grade_id else None,
+        (Homework.class_id == class_id) if class_id else None,
+    ]
+    for f in filters:
+        if f is not None:
+            query = query.where(f)
+    return session.exec(query).all()
 
 
 @router.post("/homeworks", response_model=Homework, status_code=201)
@@ -38,20 +52,6 @@ def read_homework(
 ):
     homework = session.get(Homework, homework_id)
     return homework
-
-
-@router.get(
-    "/homeworks/by_delivery_date/{delivery_date}",
-    response_model=list[Homework],
-    status_code=200,
-)
-def read_homeworks_by_delivery_date(
-    delivery_date: str,
-    session: SessionDep = Depends(SessionDep),
-):
-    return session.exec(
-        select(Homework).where(Homework.delivery_date == delivery_date)
-    ).all()
 
 
 @router.delete("/homeworks/{homework_id}", status_code=204)

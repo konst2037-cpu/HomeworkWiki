@@ -27,14 +27,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen px-4 py-8`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen px-4 py-8 max-w-3xl mx-auto justify-center items-center`}
       >
-        <header className="sticky top-0 bg-white z-10">
-          <h1 className="text-center text-4xl font-extrabold tracking-tight text-balance py-4">
+        <header className="sticky top-0 bg-white z-10 w-full">
+          <h1
+            className="text-center text-4xl font-extrabold tracking-tight text-balance py-4 bg-gradient-to-r from-slate-700 via-slate-400 to-slate-700 bg-clip-text text-transparent"
+          >
             <Link href="/">Homework Wiki</Link>
           </h1>
         </header>
+
         {children}
+
         <Toaster position="bottom-center" />
       </body>
     </html>

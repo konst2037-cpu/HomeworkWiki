@@ -6,7 +6,7 @@ import { Separator } from "./ui/separator";
 
 export default function Homework({ subject, content }: { subject: string; content: string }) {
     return (
-        <div className="grid grid-cols-[1fr_auto_2fr_auto_auto] items-center gap-3 py-2 mx-10">
+        <div className="grid grid-cols-[1fr_auto_2fr_auto_auto] items-center gap-3 justify-center mx-5 md:mx-10 bg-gray-100 px-2 py-1">
             <p>
                 {subject}
             </p>
