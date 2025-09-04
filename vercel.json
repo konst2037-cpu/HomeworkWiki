@@ -19,6 +19,7 @@
       "src": "/api/(.*)",
       "dest": "/api" 
     },
+    { "handle": "filesystem" },
     {
       "src": "/(.*)",
       "dest": "frontend/$1"
