@@ -3,10 +3,11 @@
 import HomeworkComp from "@/components/homework";
 import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
-import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, ArrowLeft, MoveLeft } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 
 function getDateFormatted(inputDate?: Date) {
     const date = inputDate ?? new Date();
@@ -101,16 +102,18 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     <ArrowBigRight className="w-6 h-6 text-slate-600" />
                 </button>
             </div>
-            <div className="flex justify-center items-center">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-3">
                 <span className="text-slate-600 font-medium">
                     {loading ? "..." : "Total homeworks: "} <Badge>{homeworks.length}</Badge>
                 </span>
-                <Link
-                    href="/homework/lookup"
-                    className="ml-4 px-3 py-1 text-slate-700 font-semibold transition"
-                >
-                    Lookup Homework
-                </Link>
+                <Button variant={"outline"}>
+                    <Link
+                        href="/homework/lookup"
+                        className="flex items-center gap-2"
+                    >
+                        <ArrowLeft /> Lookup Homework
+                    </Link>
+                </Button>
             </div>
             <div className="flex flex-col gap-1 py-4 overflow-y-auto max-h-[60vh]">
                 {loading ? (
