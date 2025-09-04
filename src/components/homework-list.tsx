@@ -37,8 +37,19 @@ export default function HomeworkListPage({ params }: ListPageProps) {
     // Fetch homeworks for currentDate
     React.useEffect(() => {
         if (!currentDate) return;
+
         setLoading(true);
-        fetch(`/api/v1/homeworks?delivery_date=${encodeURIComponent(currentDate)}&school_id=${filters.school_id}&grade_id=${filters.grade_id}&class_id=${filters.class_id}`)
+
+        const params = new URLSearchParams({
+            delivery_date: currentDate,
+        });
+
+        if (filters.school_id) params.append("school_id", filters.school_id.toString());
+        if (filters.grade_id) params.append("grade_id", filters.grade_id.toString());
+        if (filters.class_id) params.append("class_id", filters.class_id.toString());
+
+        setLoading(true);
+        fetch(`/api/v1/homeworks?${params.toString()}`)
             .then(res => res.json())
             .then(data => setHomeworks(data))
             .catch(err => setHomeworks([]))
