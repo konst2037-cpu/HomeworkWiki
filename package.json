@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "fastapi-dev": "cd ../api && pip3 install -r requirements.txt && cd .. && export PYTHONPATH=\".\" && python3 -m uvicorn api.main:app --reload",
+    "next-dev": "next dev",
+    "dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\"",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
