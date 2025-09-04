@@ -1,5 +1,5 @@
 import Home from "@/components/homework-home";
-import { Homework, School } from "@/types";
+import { School } from "@/types";
 import { Suspense } from "react";
 
 async function getSchools(): Promise<School[]> {
