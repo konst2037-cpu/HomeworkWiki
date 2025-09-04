@@ -42,7 +42,7 @@ export default function HomeworkSearchPage({ homeworks, error }: HomeworkSearchP
         <div className="flex flex-col items-center w-full px-2">
             <div className="grid grid-cols-7 gap-2 w-auto md:w-full md:max-w-4xl">
                 {/* Weekday labels in the first row */}
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((weekday) => (
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((weekday) => (
                     <div
                         key={weekday}
                         className="font-semibold text-center text-gray-500 py-1 text-xs md:text-sm"
@@ -53,11 +53,13 @@ export default function HomeworkSearchPage({ homeworks, error }: HomeworkSearchP
                 {(() => {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
+                    // Start from Monday of previous week
                     const startDate = new Date(today);
-                    startDate.setDate(today.getDate() - today.getDay() - 7);
+                    const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; // Monday=0, Sunday=6
+                    startDate.setDate(today.getDate() - dayOfWeek - 7);
 
                     const endDate = new Date(today);
-                    endDate.setDate(today.getDate() - today.getDay() + (7 * 4) + 6);
+                    endDate.setDate(today.getDate() - dayOfWeek + (7 * 4) + 6);
 
                     return Array.from({ length: 35 }).map((_, i) => {
                         const date = new Date(startDate);
@@ -74,7 +76,7 @@ export default function HomeworkSearchPage({ homeworks, error }: HomeworkSearchP
                         }).length || 0;
 
                         const isToday = date.getTime() === today.getTime();
-                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                        const isWeekend = date.getDay() === 0 || date.getDay() === 6; // Sunday or Saturday
 
                         return (
                             <div
