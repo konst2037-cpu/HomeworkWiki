@@ -17,8 +17,12 @@ export default async function Page() {
 
   try {
     schools = await getSchools();
-  } catch (err: any) {
-    error = err.message || "Unknown error";
+  } catch (err) {
+    if (err instanceof Error) {
+      error = err.message || "Unknown error";
+    } else {
+      error = "Unknown error";
+    }
   }
 
 

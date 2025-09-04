@@ -28,7 +28,7 @@ export default function Home({ schools, error = null }: HomeProps) {
         if (!userId) {
             // Use a fallback for crypto.randomUUID() for Safari/iOS
             const generateUUID = () => {
-                if (window.crypto && (window.crypto.randomUUID as any)) {
+                if (window.crypto && typeof window.crypto.randomUUID === "function") {
                     return window.crypto.randomUUID();
                 }
                 // Fallback UUID v4 generator

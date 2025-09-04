@@ -1,7 +1,7 @@
 import HomeworkSearchPage from "@/components/homework-search";
 import { Homework } from "@/types";
 
-async function getHomeworks(): Promise<any[]> {
+async function getHomeworks(): Promise<Homework[]> {
     const res = await fetch('http://localhost:8000/api/v1/homeworks', { cache: "no-store" });
     if (!res.ok) {
         throw new Error('Failed to fetch homeworks');
@@ -16,8 +16,12 @@ export default async function LookupPage() {
 
     try {
         homeworks = await getHomeworks();
-    } catch (err: any) {
-        error = err.message || "Unknown error";
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            error = err.message || "Unknown error";
+        } else {
+            error = "Unknown error";
+        }
     }
 
     return (
