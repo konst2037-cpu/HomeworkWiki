@@ -19,5 +19,5 @@ export default async function Page() {
         error = err.message || "Unknown error";
     }
 
-    return <HomeworkCreatePage schools={schools} />;
+    return <HomeworkCreatePage />;
 }

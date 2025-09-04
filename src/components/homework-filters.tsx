@@ -9,6 +9,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { gradeLevels, classChar } from "@/consts";
 import { School } from "@/types";
+import { useFilters } from "@/contexts/FilterContext";
 
 interface HomeworkFiltersProps {
     schools: School[];
@@ -21,30 +22,48 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
     const [schoolName, setSchoolName] = React.useState<string | null>(null);
     const [gradeLevel, setGradeLevel] = React.useState<number | null>(null);
     const [classSection, setClassSection] = React.useState<string | null>(null);
+    const [schoolId, setSchoolId] = React.useState<number | null>(null);
+    const [classId, setClassId] = React.useState<number | null>(null);
+
+    const { filters, setFilters } = useFilters();
 
     const setLocalStorageItem = (key: string, value: string) => {
         localStorage.setItem(key, value);
     };
 
     React.useEffect(() => {
-        setSchoolName(localStorage.getItem("filtered_school"));
+        setSchoolName(localStorage.getItem("homework_school"));
         setGradeLevel(
-            localStorage.getItem("filtered_grade")
-                ? Number(localStorage.getItem("filtered_grade"))
+            localStorage.getItem("homework_grade")
+                ? Number(localStorage.getItem("homework_grade"))
                 : null
         );
-        setClassSection(localStorage.getItem("filtered_class"));
+        setClassSection(localStorage.getItem("homework_class"));
+        setSchoolId(
+            localStorage.getItem("homework_school_id")
+                ? Number(localStorage.getItem("homework_school_id"))
+                : null
+        );
+        setClassId(
+            localStorage.getItem("homework_class_id")
+                ? Number(localStorage.getItem("homework_class_id"))
+                : null
+        );
     }, []);
 
+    React.useEffect(() => {
+        setFilters({ school_id: schoolId, grade_id: gradeLevel, class_id: classId });
+    }, [schoolId, gradeLevel, classId]);
+
     return (
-        <div className="flex flex-wrap gap-2 w-full justify-center items-center py-2">
+        <div className="flex flex-col md:flex-row gap-2 justify-center w-full md:w-1/2">
             <Popover open={openSchool} onOpenChange={setOpenSchool}>
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
                         role="combobox"
                         aria-expanded={openSchool}
-                        className="flex-1 min-w-[140px] sm:min-w-[180px] md:min-w-[200px] justify-between"
+                        className="w-full md:w-1/2 justify-between"
                     >
                         {schoolName
                             ? schools.find((sch) => sch.name === schoolName)?.name
@@ -64,8 +83,10 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                                         value={sch.name}
                                         onSelect={(currentSchool) => {
                                             setSchoolName(currentSchool);
-                                            setLocalStorageItem('filtered_school', currentSchool);
+                                            setLocalStorageItem('homework_school', currentSchool);
+                                            setLocalStorageItem('homework_school_id', sch.id.toString());
                                             setOpenSchool(false);
+                                            setSchoolId(sch.id);
                                         }}
                                     >
                                         {sch.name}
@@ -88,7 +109,7 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                         variant="outline"
                         role="combobox"
                         aria-expanded={openGrade}
-                        className="flex-1 min-w-[120px] sm:min-w-[150px] md:min-w-[170px] justify-between"
+                        className="w-full md:w-1/2 justify-between"
                     >
                         {gradeLevel
                             ? `Grade ${gradeLevel}`
@@ -108,7 +129,7 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                                         value={grade.label.toString()}
                                         onSelect={() => {
                                             setGradeLevel(grade.id);
-                                            setLocalStorageItem('filtered_grade', grade.id.toString());
+                                            setLocalStorageItem('homework_grade', grade.id.toString());
                                             setOpenGrade(false);
                                         }}
                                     >
@@ -132,10 +153,10 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                         variant="outline"
                         role="combobox"
                         aria-expanded={openClass}
-                        className="flex-1 min-w-[100px] sm:min-w-[120px] md:min-w-[140px] justify-between"
+                        className="w-full md:w-1/2 justify-between"
                     >
                         {classSection
-                            ? `Class ${classChar.find((c) => c.id === classSection)?.label}`
+                            ? `Class ${classChar.find((c) => c.label === classSection)?.label}`
                             : "Select Class"}
                         <ChevronsUpDown className="opacity-50 ml-2" />
                     </Button>
@@ -151,16 +172,18 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                                         key={section.id}
                                         value={section.label}
                                         onSelect={() => {
-                                            setClassSection(section.id);
-                                            setLocalStorageItem('filtered_class', section.id);
+                                            setClassSection(section.label);
+                                            setLocalStorageItem('homework_class', section.label);
+                                            setLocalStorageItem('homework_class_id', section.id.toString());
                                             setOpenClass(false);
+                                            setClassId(section.id);
                                         }}
                                     >
                                         {`Class ${section.label}`}
                                         <Check
                                             className={cn(
                                                 "ml-auto",
-                                                classSection === section.id ? "opacity-100" : "opacity-0"
+                                                classSection === section.label ? "opacity-100" : "opacity-0"
                                             )}
                                         />
                                     </CommandItem>

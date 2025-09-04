@@ -1,5 +1,5 @@
 export type School = {
-    id: string,
+    id: number,
     name: string
 }
 
@@ -12,5 +12,8 @@ export type Homework = {
     gpt_reasoning: string,
     gpt_status: string,
     created_date: string,
-    updated_date: string
+    updated_date: string,
+    school_id: number,
+    grade_id: number,
+    class_id: number
 }

@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, Query
 from sqlmodel import select
 
@@ -37,6 +39,7 @@ def create_homework(
     homework: Homework,
     session: SessionDep = Depends(SessionDep),
 ):
+    homework.delivery_date = date.fromisoformat(homework.delivery_date)
     session.add(homework)
     session.commit()
     session.refresh(homework)

@@ -13,7 +13,7 @@ def generate_schools_data():
     ]
 
 
-def generate_homework_data(school_ids, total=100, same_date_count=20):
+def generate_homework_data(school_ids, total=10000, same_date_count=20):
     homework_data = []
     today = datetime.now()
     user_ids = ["user1", "user2", "user3"]  # Example user IDs
@@ -24,14 +24,14 @@ def generate_homework_data(school_ids, total=100, same_date_count=20):
         "World War II essay",
         "Poetry analysis",
     ]
+    grade_levels = [i for i in range(1, 13)]
+    class_ids = [i for i in range(1, 7)]
 
     # Only generate homework for the next 14 days
     max_days = 14
-    entries_to_generate = min(total, max_days)
-    same_date_count = min(same_date_count, entries_to_generate)
 
     # Generate homework entries with the same delivery date
-    same_date = (today + timedelta(days=1)).strftime("%Y-%m-%d")
+    same_date = (today + timedelta(days=1)).date()
     for i in range(same_date_count):
         homework_data.append(
             Homework(
@@ -40,13 +40,16 @@ def generate_homework_data(school_ids, total=100, same_date_count=20):
                 content=contents[i % len(contents)],
                 user_id=user_ids[i % len(user_ids)],
                 school_id=school_ids[i % len(school_ids)],
+                grade_id=grade_levels[i % len(grade_levels)],
+                class_id=class_ids[i % len(class_ids)],
                 gpt_reasoning="Relevant to curriculum",
                 gpt_status=GPTStatus.APPROVED,
             )
         )
+
     # Generate the rest with unique future delivery dates (up to 14 days)
-    for i in range(same_date_count, entries_to_generate):
-        future_date = (today + timedelta(days=(i % max_days))).isoformat()
+    for i in range(same_date_count, total):
+        future_date = (today + timedelta(days=(i % max_days))).date()
         homework_data.append(
             Homework(
                 subject=subjects[i % len(subjects)],
@@ -54,6 +57,8 @@ def generate_homework_data(school_ids, total=100, same_date_count=20):
                 content=contents[i % len(contents)],
                 user_id=user_ids[i % len(user_ids)],
                 school_id=school_ids[i % len(school_ids)],
+                grade_id=grade_levels[i % len(grade_levels)],
+                class_id=class_ids[i % len(class_ids)],
                 gpt_reasoning="Relevant to curriculum",
                 gpt_status=GPTStatus.APPROVED,
             )

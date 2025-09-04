@@ -5,57 +5,31 @@ import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { School } from "@/types";
 import { ChevronDownIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
-import { gradeLevels, classChar } from "@/consts";
 import React from "react";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion"
+import { useFilters } from "@/contexts/FilterContext";
 
-interface HomeworkCreatePageProps {
-    schools: School[];
-}
 
-export default function HomeworkCreatePage({ schools }: HomeworkCreatePageProps) {
+export default function HomeworkCreatePage() {
     const [open, setOpen] = React.useState(false);
-    const [openSchool, setOpenSchool] = React.useState(false);
-    const [openGrade, setOpenGrade] = React.useState(false);
-    const [openClass, setOpenClass] = React.useState(false);
-    const [schoolName, setSchoolName] = React.useState<string | null>(null);
-    const [gradeLevel, setGradeLevel] = React.useState<number | null>(null);
-    const [classSection, setClassSection] = React.useState<string | null>(null);
     const [date, setDate] = React.useState<Date | undefined>(undefined)
     const [deliveryDate, setDeliveryDate] = React.useState<string | null>(null);
     const [subject, setSubject] = React.useState("");
     const [content, setContent] = React.useState("");
     const [userId, setUserId] = React.useState<string | null>(null);
     const [error, setError] = React.useState<string | null>("All fields are required.");
-    const [openItem, setOpenItem] = React.useState<string>("");
-
-
-    const isAllSchoolDetailsFilled = () => {
-        return schoolName && gradeLevel && classSection;
-    };
+    const { filters, setFilters } = useFilters();
 
 
     React.useEffect(() => {
         const storedUserId = localStorage.getItem("homework_user_id");
-        const storedSchoolName = localStorage.getItem("filtered_school");
-        const storedGradeLevel = localStorage.getItem("filtered_grade");
-        const storedClassSection = localStorage.getItem("filtered_class");
+        const storedSchoolName = localStorage.getItem("homework_school");
+        const storedGradeLevel = localStorage.getItem("homework_grade");
+        const storedClassSection = localStorage.getItem("homework_class");
         setUserId(storedUserId);
-        setSchoolName(storedSchoolName);
-        setGradeLevel(storedGradeLevel ? parseInt(storedGradeLevel) : null);
-        setClassSection(storedClassSection);
+        console.log(filters);
     }, []);
 
     React.useEffect(() => {
@@ -85,11 +59,6 @@ export default function HomeworkCreatePage({ schools }: HomeworkCreatePageProps)
     };
 
     const handleSubmit = () => {
-        if (!isAllSchoolDetailsFilled()) {
-            toast.error("Please fill in all school details.");
-            setOpenItem("item-1");
-            return;
-        }
 
         if (!validate()) {
             if (error) {
@@ -108,6 +77,9 @@ export default function HomeworkCreatePage({ schools }: HomeworkCreatePageProps)
                 delivery_date: deliveryDate,
                 content,
                 user_id: userId,
+                school_id: filters.school_id,
+                class_id: filters.class_id,
+                grade_id: filters.grade_id
             }),
         }).then(res => {
             if (res.ok) {
@@ -119,9 +91,9 @@ export default function HomeworkCreatePage({ schools }: HomeworkCreatePageProps)
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-full gap-10 px-4">
-            <h2 className="scroll-m-20 border-b pb-2 text-xl md:text-3xl md:font-semibold tracking-tight first:mt-0">
-                Add Homework
+        <div className="flex flex-col h-full items-center gap-10 px-4">
+            <h2 className="scroll-m-20 border-b pb-2 text-xl md:text-2xl md:font-semibold tracking-tight first:mt-0">
+                Post Homework
             </h2>
             <form
                 className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl"
@@ -130,152 +102,7 @@ export default function HomeworkCreatePage({ schools }: HomeworkCreatePageProps)
                     handleSubmit();
                 }}
             >
-                <Accordion type="single" className="md:col-span-2" value={openItem} onValueChange={setOpenItem}>
-                    <AccordionItem value="item-1">
-                        <AccordionTrigger className="w-full">Do you want to change school details?</AccordionTrigger>
-                        <AccordionContent className="flex flex-col gap-2">
-                            <div className="flex flex-col gap-2">
-                                <Popover open={openSchool} onOpenChange={setOpenSchool}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={openSchool}
-                                            className="w-full font-normal justify-between"
-                                        >
-                                            {schoolName
-                                                ? schools.find((sch) => sch.name === schoolName)?.name
-                                                : "Select School"}
-                                            <ChevronsUpDown className="opacity-50 ml-2" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-full md:w-fit p-0">
-                                        <Command>
-                                            <CommandInput placeholder="Search school..." className="h-9" />
-                                            <CommandList>
-                                                <CommandEmpty>No school found.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {schools?.map((sch) => (
-                                                        <CommandItem
-                                                            key={sch.id}
-                                                            value={sch.name}
-                                                            onSelect={(currentSchool) => {
-                                                                setSchoolName(currentSchool)
-                                                                setOpenSchool(false)
-                                                            }}
-                                                        >
-                                                            {sch.name}
-                                                            <Check
-                                                                className={cn(
-                                                                    "ml-auto",
-                                                                    schoolName === sch.name ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Popover open={openGrade} onOpenChange={setOpenGrade}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={openGrade}
-                                            className="w-full font-normal justify-between"
-                                        >
-                                            {gradeLevel
-                                                ? `Grade ${gradeLevel}`
-                                                : "Select Grade"}
-                                            <ChevronsUpDown className="opacity-50 ml-2" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-full md:w-fit p-0">
-                                        <Command>
-                                            <CommandInput placeholder="Search grade..." className="h-9" />
-                                            <CommandList>
-                                                <CommandEmpty>No grade found.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {gradeLevels.map((grade) => (
-                                                        <CommandItem
-                                                            key={grade.id}
-                                                            value={grade.label.toString()}
-                                                            onSelect={() => {
-                                                                setGradeLevel(grade.id);
-                                                                setOpenGrade(false);
-                                                            }}
-                                                        >
-                                                            {`Grade ${grade.label}`}
-                                                            <Check
-                                                                className={cn(
-                                                                    "ml-auto",
-                                                                    gradeLevel === grade.label ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Popover open={openClass} onOpenChange={setOpenClass}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={openClass}
-                                            className="w-full font-normal justify-between"
-                                        >
-                                            {classSection
-                                                ? `Class ${classChar.find((c) => c.id === classSection)?.label}`
-                                                : "Select Class"}
-                                            <ChevronsUpDown className="opacity-50 ml-2" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-full md:w-fit p-0">
-                                        <Command>
-                                            <CommandInput placeholder="Search class..." className="h-9" />
-                                            <CommandList>
-                                                <CommandEmpty>No class found.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {classChar.map((section) => (
-                                                        <CommandItem
-                                                            key={section.id}
-                                                            value={section.label}
-                                                            onSelect={() => {
-                                                                setClassSection(section.id);
-                                                                setOpenClass(false);
-                                                            }}
-                                                        >
-                                                            {`Class ${section.label}`}
-                                                            <Check
-                                                                className={cn(
-                                                                    "ml-auto",
-                                                                    classSection === section.id ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-
                 <div className="flex flex-col md:flex-row gap-2 md:col-span-2">
-
-
                     <div className="flex flex-col gap-2">
                         <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
@@ -294,6 +121,7 @@ export default function HomeworkCreatePage({ schools }: HomeworkCreatePageProps)
                                     selected={date}
                                     captionLayout="dropdown"
                                     onSelect={(date) => {
+                                        console.log(date);
                                         setDate(date)
                                         setOpen(false)
                                     }}
@@ -316,7 +144,7 @@ export default function HomeworkCreatePage({ schools }: HomeworkCreatePageProps)
                         className="w-full"
                     />
                 </div>
-                <div className="flex flex-col gap-2 md:col-span-2">
+                <div className="flex flex-col md:col-span-2">
 
                     <Textarea
                         placeholder="Enter homework details..."

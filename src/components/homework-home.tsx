@@ -2,19 +2,17 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Homework, School } from "@/types";
-import HomeworkSearchPage from "@/components/homework-search";
 import Link from "next/link";
 import { toast } from "sonner";
 import HomeworkFilters from "./homework-filters";
+import { School } from "@/types";
 
 interface HomeProps {
     schools: School[];
-    homeworks: Homework[];
     error: string | null;
 }
 
-export default function Home({ schools, homeworks, error = null }: HomeProps) {
+export default function Home({ schools, error = null }: HomeProps) {
 
 
     React.useEffect(() => {
@@ -47,16 +45,22 @@ export default function Home({ schools, homeworks, error = null }: HomeProps) {
 
 
     return (
-        <div className="md:h-full flex flex-col gap-5 mt-10">
-            <div className="flex flex-wrap gap-2 md:gap-3 items-center md:justify-center">
+        <div className="md:h-full flex flex-col gap-5">
+            <div className="flex flex-col flex-wrap gap-2 md:gap-3 items-center md:justify-center">
                 <HomeworkFilters schools={schools} />
-                <Link href="/homework/create" className="w-full md:w-fit">
-                    <Button variant="default" className="w-full md:w-fit py-4" style={{ cursor: "pointer" }}>
-                        Post HomeWork
-                    </Button>
-                </Link>
+                <div className="flex flex-col md:flex-row gap-2 w-full md:w-1/3">
+                    <Link href="/homework/create" className="w-full md:w-fit">
+                        <Button variant="default" className="w-full md:w-fit py-4" style={{ cursor: "pointer" }}>
+                            Post Homework
+                        </Button>
+                    </Link>
+                    <Link href="/homework/lookup" className="w-full md:w-fit">
+                        <Button variant="default" className="w-full md:w-fit py-4" style={{ cursor: "pointer" }}>
+                            Lookup Homework
+                        </Button>
+                    </Link>
+                </div>
             </div>
-            <HomeworkSearchPage homeworks={homeworks} />
         </div>
     );
 }

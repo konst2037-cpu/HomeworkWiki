@@ -1,6 +1,7 @@
 'use client'
 
 import HomeworkComp from "@/components/homework";
+import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
 import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import React from "react";
@@ -26,6 +27,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
     const [homeworks, setHomeworks] = React.useState<Homework[]>([]);
     const [deliveryDates, setDeliveryDates] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const { filters, setFilters } = useFilters();
 
     // Get delivery_date from params
     React.useEffect(() => {
@@ -36,7 +38,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
     React.useEffect(() => {
         if (!currentDate) return;
         setLoading(true);
-        fetch(`/api/v1/homeworks?delivery_date=${encodeURIComponent(currentDate)}`)
+        fetch(`/api/v1/homeworks?delivery_date=${encodeURIComponent(currentDate)}&school_id=${filters.school_id}&grade_id=${filters.grade_id}&class_id=${filters.class_id}`)
             .then(res => res.json())
             .then(data => setHomeworks(data))
             .catch(err => setHomeworks([]))
@@ -65,7 +67,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
 
     return (
         <div>
-            <div className="flex items-center justify-between md:py-2 px-6">
+            <div className="flex items-center justify-between md:py-2">
                 <button
                     className="p-2 rounded-full hover:bg-slate-300 transition disabled:opacity-50"
                     onClick={() => handleNavigate(prevDeliveryDate)}
@@ -86,7 +88,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     <ArrowBigRight className="w-6 h-6 text-slate-600" />
                 </button>
             </div>
-            <div className="flex flex-col gap-1 px-6 py-4 overflow-y-auto max-h-[60vh]">
+            <div className="flex flex-col gap-1 py-4 overflow-y-auto max-h-[60vh]">
                 {loading ? (
                     <div className="text-slate-500 flex justify-center items-center h-40">Loading...</div>
                 ) : Array.isArray(homeworks) && homeworks.length > 0 ? (
