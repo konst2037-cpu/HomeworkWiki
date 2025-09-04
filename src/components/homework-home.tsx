@@ -7,19 +7,25 @@ import { toast } from "sonner";
 import HomeworkFilters from "./homework-filters";
 import { School } from "@/types";
 
-interface HomeProps {
-    schools: School[];
-    error: string | null;
-}
 
-export default function Home({ schools, error = null }: HomeProps) {
-
+export default function Home() {
+    const [schools, setSchools] = React.useState<School[]>([]);
 
     React.useEffect(() => {
-        if (error) {
-            toast.error(error);
+        async function fetchSchools() {
+            try {
+                const res = await fetch('/api/v1/schools', { cache: "no-store" });
+                if (!res.ok) {
+                    throw new Error('Failed to fetch schools');
+                }
+                const data = await res.json();
+                setSchools(data);
+            } catch (error) {
+                toast.error("Could not load schools");
+            }
         }
-    }, [error]);
+        fetchSchools();
+    }, []);
 
     React.useEffect(() => {
 

@@ -10,18 +10,18 @@
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.13",
-        "wsgi": "api.main:app"
+        "asgi": "api.main:app"
       }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api" 
+      "dest": "api/main.py"
     },
     {
       "src": "/(.*)",
-      "dest": "src/$1"
+      "dest": "/"
     }
   ]
 }

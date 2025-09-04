@@ -14,7 +14,7 @@ def read_homeworks(
     session: SessionDep = Depends(SessionDep),
     offset: int = 0,
     limit: int = Query(default=None, le=100),
-    delivery_date: str | None = Query(default=None),
+    delivery_date: date | None = Query(default=None),
     school_id: int | None = Query(default=None),
     grade_id: int | None = Query(default=None),
     class_id: int | None = Query(default=None),

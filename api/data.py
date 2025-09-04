@@ -13,7 +13,7 @@ def generate_schools_data():
     ]
 
 
-def generate_homework_data(school_ids, total=10000, same_date_count=20):
+def generate_homework_data(school_ids, total=100, same_date_count=20):
     homework_data = []
     today = datetime.now()
     user_ids = ["user1", "user2", "user3"]  # Example user IDs

@@ -13,16 +13,26 @@ interface HomeworkSearchPageProps {
 
 import { useRouter } from "next/navigation";
 
-export default function HomeworkSearchPage({ homeworks, error }: HomeworkSearchPageProps) {
-
-    React.useEffect(() => {
-        if (error) {
-            toast.error(error);
-        }
-    }, [error]);
-
+export default function HomeworkSearchPage() {
+    const [homeworks, setHomeworks] = React.useState<Homework[]>([]);
     const { filters, setFilters } = useFilters();
     const router = useRouter();
+
+    React.useEffect(() => {
+        async function fetchHomeworks() {
+            try {
+                const res = await fetch('/api/v1/homeworks', { cache: "no-store" });
+                if (!res.ok) {
+                    throw new Error('Failed to fetch homeworks');
+                }
+                const data = await res.json();
+                setHomeworks(data);
+            } catch (error) {
+                toast.error('Failed to fetch homeworks');
+            }
+        }
+        fetchHomeworks();
+    }, []);
 
     const filteredHomeworks = homeworks.filter(hw => {
         let matches = true;

@@ -1,8 +1,10 @@
 from sqlmodel import Session, create_engine
+import os
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
-engine = create_engine(sqlite_url, echo=True)
+DATABASE_URL = os.getenv("DATABASE_URL", sqlite_url)
+engine = create_engine(DATABASE_URL, echo=True)
 
 
 def get_session():
