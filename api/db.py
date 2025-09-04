@@ -3,7 +3,7 @@ import os
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
-DATABASE_URL = os.getenv("DATABASE_URL", sqlite_url)
+DATABASE_URL = os.getenv("PGDATABASE_URL", sqlite_url)
 engine = create_engine(DATABASE_URL, echo=True)
 
 
