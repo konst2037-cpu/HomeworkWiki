@@ -4,7 +4,9 @@ import HomeworkComp from "@/components/homework";
 import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
 import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import Link from "next/link";
 import React from "react";
+import { Badge } from "./ui/badge";
 
 function getDateFormatted(inputDate?: Date) {
     const date = inputDate ?? new Date();
@@ -78,7 +80,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
 
     return (
         <div>
-            <div className="flex items-center justify-between md:py-2">
+            <div className="flex items-center gap-10 justify-center md:py-2">
                 <button
                     className="p-2 rounded-full hover:bg-slate-300 transition disabled:opacity-50"
                     onClick={() => handleNavigate(prevDeliveryDate)}
@@ -99,11 +101,23 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     <ArrowBigRight className="w-6 h-6 text-slate-600" />
                 </button>
             </div>
+            <div className="flex justify-center items-center">
+                <span className="text-slate-600 font-medium">
+                    {loading ? "..." : "Total homeworks: "} <Badge>{homeworks.length}</Badge>
+                </span>
+                <Link
+                    href="/homework/lookup"
+                    className="ml-4 px-3 py-1 text-slate-700 font-semibold transition"
+                >
+                    Lookup Homework
+                </Link>
+            </div>
             <div className="flex flex-col gap-1 py-4 overflow-y-auto max-h-[60vh]">
                 {loading ? (
                     <div className="text-slate-500 flex justify-center items-center h-40">Loading...</div>
                 ) : Array.isArray(homeworks) && homeworks.length > 0 ? (
                     homeworks.map((hw, idx) => (
+
                         <HomeworkComp key={idx} subject={hw.subject} content={hw.content} />
                     ))
                 ) : (

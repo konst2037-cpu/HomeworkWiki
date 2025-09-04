@@ -129,7 +129,7 @@ export default function HomeworkCreatePage() {
                                         const today = new Date();
                                         const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                                         const end = new Date(start);
-                                        end.setDate(start.getDate() + 13);
+                                        end.setDate(start.getDate() + 27);
                                         return date < start || date > end;
                                     }}
                                 />
