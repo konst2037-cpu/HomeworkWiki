@@ -13,9 +13,6 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
 
 # production
 /build
@@ -47,3 +44,9 @@ venv/
 .venv/
 .vercel
 *.db
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+/database.db
+.vercel
