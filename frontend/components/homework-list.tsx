@@ -43,6 +43,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
 
         setLoading(true);
 
+        // Filters
         const params = new URLSearchParams({
             delivery_date: currentDate,
         });
@@ -104,7 +105,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
             </div>
             <div className="flex flex-col md:flex-row justify-center items-center gap-3">
                 <span className="text-slate-600 font-medium">
-                    {loading ? "..." : "Total homeworks: "} <Badge>{homeworks.length}</Badge>
+                    Total homeworks: <Badge>{homeworks.length}</Badge>
                 </span>
                 <Button variant={"outline"}>
                     <Link
@@ -119,9 +120,9 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                 {loading ? (
                     <div className="text-slate-500 flex justify-center items-center h-40">Loading...</div>
                 ) : Array.isArray(homeworks) && homeworks.length > 0 ? (
-                    homeworks.map((hw, idx) => (
+                    homeworks.map((hw) => (
 
-                        <HomeworkComp key={idx} subject={hw.subject} content={hw.content} />
+                        <HomeworkComp key={hw.id} subject={hw.subject} content={hw.content} id={hw.id} />
                     ))
                 ) : (
                     <div className="text-slate-500 flex justify-center items-center h-40">No homework found.</div>
