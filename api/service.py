@@ -1,21 +1,17 @@
 from openai import OpenAI
 from pydantic import BaseModel
-from enum import Enum
+from api.models import GPTStatus
 
 
-prompt = (
-    "You are a validator. Check if the provided content is related to homework. "
-    "Do not allow strong language or adult content. "
-)
+prompt = """You are managing a public record of school homework. Pupils are submitting homework records for school subjects. Your task is to analyse the proposed records and decide if they should be published in the public record. The homework is: “XXX”. The subject is “YYY”. Here are some criteria: 
+It should be plausible that the record is a homework for the given subject. 
+The suggested record must not use strong language and must not be insulting to anyone. 
+The suggested record must not mention attributes or give names to any person. """
 
 
 class ContentResponse(BaseModel):
-    class StatusEnum(str, Enum):
-        APPROVED = "Approved"
-        REJECTED = "Rejected"
-
-    status: StatusEnum
-    reason: str | None = None
+    status: GPTStatus
+    reason: str
 
 
 class ContentValidator:

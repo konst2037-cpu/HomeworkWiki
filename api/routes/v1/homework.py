@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlmodel import select
 
 from api.db import get_session as SessionDep
-from api.models import Homework
+from api.models import Homework, GPTStatus
 from api.service import ContentValidator
 from fastapi import HTTPException
 
@@ -47,11 +47,14 @@ def create_homework(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    if response.status == response.StatusEnum.REJECTED:
-        raise HTTPException(status_code=422, detail=response.reason)
+    if response.status == GPTStatus.REJECTED:
+        raise HTTPException(
+            status_code=422,
+            detail="Sorry, we cannot publish this record at the moment.",
+        )
 
     homework.gpt_reasoning = response.reason
-    homework.gpt_status = response.status.value
+    homework.gpt_status = response.status
     homework.delivery_date = date.fromisoformat(homework.delivery_date)
     session.add(homework)
     session.commit()
