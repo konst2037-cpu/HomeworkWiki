@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import React from "react";
@@ -21,15 +21,12 @@ export default function HomeworkCreatePage() {
     const [userId, setUserId] = React.useState<string | null>(null);
     const [error, setError] = React.useState<string | null>("All fields are required.");
     const { filters, setFilters } = useFilters();
+    const [loading, setLoading] = React.useState(false);
 
 
     React.useEffect(() => {
         const storedUserId = localStorage.getItem("homework_user_id");
-        const storedSchoolName = localStorage.getItem("homework_school");
-        const storedGradeLevel = localStorage.getItem("homework_grade");
-        const storedClassSection = localStorage.getItem("homework_class");
         setUserId(storedUserId);
-        console.log(filters);
     }, []);
 
     React.useEffect(() => {
@@ -63,6 +60,7 @@ export default function HomeworkCreatePage() {
         if (!validate()) {
             if (error) {
                 toast.error(error);
+                setLoading(false);
             }
             return;
         }
@@ -82,11 +80,18 @@ export default function HomeworkCreatePage() {
                 grade_id: filters.grade_id
             }),
         }).then(res => {
-            if (res.ok) {
+            if (res.status === 422) {
+                res.json().then(data => {
+                    console.log(data);
+                    toast.error(data?.detail || "Validation error. Please check your input.");
+                });
+            } else if (res.ok) {
                 window.location.href = `/homework/list/${deliveryDate}`;
             } else {
                 toast.error("Failed to create homework.");
             }
+        }).finally(() => {
+            setLoading(false);
         });
     };
 
@@ -98,6 +103,7 @@ export default function HomeworkCreatePage() {
             <form
                 className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl"
                 onSubmit={e => {
+                    setLoading(true);
                     e.preventDefault();
                     handleSubmit();
                 }}
@@ -154,7 +160,10 @@ export default function HomeworkCreatePage() {
                     />
 
                 </div>
-                <div className="flex gap-4 md:col-span-2 justify-end mt-4">
+                <div className="flex gap-4 md:col-span-2 justify-end mt-4 items-center">
+                    {loading && (
+                        <LoaderCircle className="animate-spin h-6 w-6 text-primary items-center" />
+                    )}
                     <Button
                         variant="default"
                         className="font-normal px-10"

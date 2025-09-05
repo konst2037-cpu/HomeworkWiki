@@ -5,6 +5,8 @@ from sqlmodel import select
 
 from api.db import get_session as SessionDep
 from api.models import Homework
+from api.service import ContentValidator
+from fastapi import HTTPException
 
 router = APIRouter(prefix="/v1", tags=["homework"])
 
@@ -38,7 +40,18 @@ def read_homeworks(
 def create_homework(
     homework: Homework,
     session: SessionDep = Depends(SessionDep),
+    validator: ContentValidator = Depends(ContentValidator),
 ):
+    try:
+        response = validator.generate_response(homework.content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    if response.status == response.StatusEnum.REJECTED:
+        raise HTTPException(status_code=422, detail=response.reason)
+
+    homework.gpt_reasoning = response.reason
+    homework.gpt_status = response.status.value
     homework.delivery_date = date.fromisoformat(homework.delivery_date)
     session.add(homework)
     session.commit()
