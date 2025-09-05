@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import { Toaster } from "@/components/ui/sonner"
 import { FilterProvider } from "@/contexts/FilterContext";
+import Footer from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen px-4 py-8 max-w-4xl mx-auto`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen px-4 max-w-4xl mx-auto`}
       >
         <header className="sticky top-0 bg-white z-10 w-full">
           <h1
-            className="text-center text-4xl font-extrabold tracking-tight text-balance py-4 bg-gradient-to-r from-slate-700 via-slate-400 to-slate-700 bg-clip-text text-transparent md:my-10 "
+            className="text-center text-4xl font-extrabold tracking-tight text-balance py-4 bg-gradient-to-r from-slate-700 via-slate-400 to-slate-700 bg-clip-text text-transparent md:my-2 "
           >
             <Link href="/">Homework Wiki</Link>
           </h1>
@@ -40,6 +41,7 @@ export default function RootLayout({
 
         <FilterProvider>
           {children}
+          <Footer />
         </FilterProvider>
 
         <Toaster position="bottom-center" />
