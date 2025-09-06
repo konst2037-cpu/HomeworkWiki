@@ -39,7 +39,7 @@ export default function HomeworkSearchPage() {
     React.useEffect(() => {
         async function fetchHomeworks() {
             try {
-                const params = new URLSearchParams();
+                const params = new URLSearchParams(window.location.search);
                 if (filters.school_id) params.set('school_id', filters.school_id.toString());
                 if (filters.grade_id) params.set('grade_id', filters.grade_id.toString());
                 if (filters.class_id) params.set('class_id', filters.class_id.toString());
