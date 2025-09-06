@@ -18,30 +18,30 @@ type FilterContextType = {
 const FilterContext = createContext<FilterContextType | undefined>(undefined)
 
 export const FilterProvider = ({ children }: { children: React.ReactNode }) => {
-    const [filters, setFilters] = useState<Filters>({
-        school_id: null,
-        grade_id: null,
-        class_id: null,
-        schoolName: null,
-        className: null
-    })
+    const [filters, setFilters] = useState<Filters>(() => {
+        if (typeof window !== "undefined") {
+            const storedSchoolId = localStorage.getItem("homework_school_id");
+            const storedGradeId = localStorage.getItem("homework_grade_id");
+            const storedClassId = localStorage.getItem("homework_class_id");
+            const storedSchoolName = localStorage.getItem("homework_school");
+            const storedClassName = localStorage.getItem("homework_class");
 
-    React.useEffect(() => {
-        const storedSchoolId = localStorage.getItem("homework_school_id");
-        const storedGradeId = localStorage.getItem("homework_grade");
-        const storedClassId = localStorage.getItem("homework_class_id");
-        const storedSchoolName = localStorage.getItem("homework_school");
-        const storedClassName = localStorage.getItem("homework_class");
-
-
-        setFilters({
-            school_id: storedSchoolId ? Number(storedSchoolId) : null,
-            grade_id: storedGradeId ? Number(storedGradeId) : null,
-            class_id: storedClassId ? Number(storedClassId) : null,
-            className: storedClassName,
-            schoolName: storedSchoolName
-        });
-    }, []);
+            return {
+                school_id: storedSchoolId ? Number(storedSchoolId) : null,
+                grade_id: storedGradeId ? Number(storedGradeId) : null,
+                class_id: storedClassId ? Number(storedClassId) : null,
+                schoolName: storedSchoolName,
+                className: storedClassName,
+            }
+        }
+        return {
+            school_id: null,
+            grade_id: null,
+            class_id: null,
+            schoolName: null,
+            className: null,
+        }
+    });
 
     React.useEffect(() => {
         if (filters.school_id !== null)
@@ -49,7 +49,7 @@ export const FilterProvider = ({ children }: { children: React.ReactNode }) => {
 
 
         if (filters.grade_id !== null)
-            localStorage.setItem("homework_grade_id", String(filters.grade_id));
+            localStorage.setItem("homework_grade", String(filters.grade_id));
 
         if (filters.class_id !== null)
             localStorage.setItem("homework_class_id", String(filters.class_id));
