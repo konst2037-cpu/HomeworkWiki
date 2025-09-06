@@ -25,7 +25,7 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
     const [schoolId, setSchoolId] = React.useState<number | null>(null);
     const [classId, setClassId] = React.useState<number | null>(null);
 
-    const { filters, setFilters } = useFilters();
+    const { setFilters } = useFilters();
 
     const setLocalStorageItem = (key: string, value: string) => {
         localStorage.setItem(key, value);
@@ -52,8 +52,8 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
     }, []);
 
     React.useEffect(() => {
-        setFilters({ school_id: schoolId, grade_id: gradeLevel, class_id: classId });
-    }, [schoolId, gradeLevel, classId]);
+        setFilters({ school_id: schoolId, grade_id: gradeLevel, class_id: classId, className: classSection, schoolName: schoolName });
+    }, [schoolId, gradeLevel, classId, classSection, schoolName]);
 
     return (
         <div className="flex flex-col md:flex-row gap-2 justify-center w-full md:w-1/2">

@@ -44,7 +44,7 @@ export default function RootLayout({
           <Footer />
         </FilterProvider>
 
-        <Toaster position="bottom-center" />
+        <Toaster position="bottom-center" richColors />
       </body>
     </html>
   );
