@@ -50,3 +50,4 @@ frontend/out/
 frontend/dist/
 /database.db
 .vercel
+.next

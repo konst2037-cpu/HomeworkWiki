@@ -7,15 +7,17 @@ import { PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { gradeLevels, classChar } from "@/consts";
-import { School } from "@/types";
+// import { gradeLevels, classChar } from "@/consts";
+import { ClassChar, GradeLevel, School } from "@/types";
 import { useFilters } from "@/contexts/FilterContext";
 
 interface HomeworkFiltersProps {
     schools: School[];
+    grades: GradeLevel[];
+    classes: ClassChar[];
 }
 
-export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
+export default function HomeworkFilters({ schools, grades, classes }: HomeworkFiltersProps) {
     const [openSchool, setOpenSchool] = React.useState(false);
     const [openGrade, setOpenGrade] = React.useState(false);
     const [openClass, setOpenClass] = React.useState(false);
@@ -73,7 +75,7 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                 </PopoverTrigger>
                 <PopoverContent className="w-full sm:w-[220px] md:w-[240px] p-0">
                     <Command>
-                        <CommandInput placeholder="Search school..." className="h-9" />
+                        <CommandInput placeholder="Search school..." className="h-9" required />
                         <CommandList>
                             <CommandEmpty>No school found.</CommandEmpty>
                             <CommandGroup>
@@ -123,21 +125,21 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                         <CommandList>
                             <CommandEmpty>No grade found.</CommandEmpty>
                             <CommandGroup>
-                                {gradeLevels.map((grade) => (
+                                {grades?.map((grade) => (
                                     <CommandItem
                                         key={grade.id}
-                                        value={grade.label.toString()}
+                                        value={grade.name.toString()}
                                         onSelect={() => {
                                             setGradeLevel(grade.id);
                                             setLocalStorageItem('homework_grade', grade.id.toString());
                                             setOpenGrade(false);
                                         }}
                                     >
-                                        {`Grade ${grade.label}`}
+                                        {`Grade ${grade.name}`}
                                         <Check
                                             className={cn(
                                                 "ml-auto",
-                                                gradeLevel === grade.label ? "opacity-100" : "opacity-0"
+                                                gradeLevel?.toString() === grade.name ? "opacity-100" : "opacity-0"
                                             )}
                                         />
                                     </CommandItem>
@@ -156,7 +158,7 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                         className="w-full md:w-1/2 justify-between"
                     >
                         {classSection
-                            ? `Class ${classChar.find((c) => c.label === classSection)?.label}`
+                            ? `Class ${classes.find((c) => c.name === classSection)?.name}`
                             : "Select Class"}
                         <ChevronsUpDown className="opacity-50 ml-2" />
                     </Button>
@@ -167,23 +169,23 @@ export default function HomeworkFilters({ schools }: HomeworkFiltersProps) {
                         <CommandList>
                             <CommandEmpty>No class found.</CommandEmpty>
                             <CommandGroup>
-                                {classChar.map((section) => (
+                                {classes?.map((section) => (
                                     <CommandItem
                                         key={section.id}
-                                        value={section.label}
+                                        value={section.name}
                                         onSelect={() => {
-                                            setClassSection(section.label);
-                                            setLocalStorageItem('homework_class', section.label);
+                                            setClassSection(section.name);
+                                            setLocalStorageItem('homework_class', section.name);
                                             setLocalStorageItem('homework_class_id', section.id.toString());
                                             setOpenClass(false);
                                             setClassId(section.id);
                                         }}
                                     >
-                                        {`Class ${section.label}`}
+                                        {`Class ${section.name}`}
                                         <Check
                                             className={cn(
                                                 "ml-auto",
-                                                classSection === section.label ? "opacity-100" : "opacity-0"
+                                                classSection === section.name ? "opacity-100" : "opacity-0"
                                             )}
                                         />
                                     </CommandItem>

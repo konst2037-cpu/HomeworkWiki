@@ -21,7 +21,7 @@ export const FilterProvider = ({ children }: { children: React.ReactNode }) => {
     const [filters, setFilters] = useState<Filters>(() => {
         if (typeof window !== "undefined") {
             const storedSchoolId = localStorage.getItem("homework_school_id");
-            const storedGradeId = localStorage.getItem("homework_grade_id");
+            const storedGradeId = localStorage.getItem("homework_grade");
             const storedClassId = localStorage.getItem("homework_class_id");
             const storedSchoolName = localStorage.getItem("homework_school");
             const storedClassName = localStorage.getItem("homework_class");

@@ -3,6 +3,16 @@ export type School = {
     name: string
 }
 
+export type GradeLevel = {
+    id: number,
+    name: string
+}
+
+export type ClassChar = {
+    id: number,
+    name: string
+}
+
 export type Homework = {
     id: number,
     subject: string,

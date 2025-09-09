@@ -9,12 +9,23 @@ import { toast } from "sonner";
 
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
-import { Copy } from "lucide-react";
+import { Copy, Share } from "lucide-react";
 
 export default function HomeworkSearchPage() {
     const [homeworks, setHomeworks] = React.useState<Homework[]>([]);
     const { filters, setFilters } = useFilters();
     const router = useRouter();
+
+    const shareUrl = (() => {
+        const currentUrl = window.location.href;
+        const params = new URLSearchParams();
+        if (filters.school_id) params.set('school_id', filters.school_id.toString());
+        if (filters.grade_id) params.set('grade_id', filters.grade_id.toString());
+        if (filters.class_id) params.set('class_id', filters.class_id.toString());
+        if (filters.className) params.set('class', filters.className.toString());
+        if (filters.schoolName) params.set('school', filters.schoolName.toString());
+        return `${currentUrl.split('?')[0]}?${params.toString()}`;
+    });
 
     // Set all filters from shared link parameters on page load.
     // This allows users to view homeworks directly without manually selecting school, grade, or class.
@@ -124,25 +135,27 @@ export default function HomeworkSearchPage() {
                     });
                 })()}
             </div>
-            <div className="flex justify-end w-full md:max-w-4xl">
+            <div className="flex justify-end w-full md:max-w-4xl gap-2">
                 <Button
-                    variant="default"
-                    className="cursor-pointer my-2"
+                    variant="outline"
+                    className="cursor-pointer my-2 flex items-center gap-2 border-blue-500 text-blue-700 hover:bg-blue-50 hover:border-blue-700 transition-all shadow-sm"
                     onClick={() => {
-                        const currentUrl = window.location.href;
-                        const params = new URLSearchParams();
-                        if (filters.school_id) params.set('school_id', filters.school_id.toString());
-                        if (filters.grade_id) params.set('grade_id', filters.grade_id.toString());
-                        if (filters.class_id) params.set('class_id', filters.class_id.toString());
-                        if (filters.className) params.set('class', filters.className.toString());
-                        if (filters.schoolName) params.set('school', filters.schoolName.toString());
-                        const shareUrl = `${currentUrl.split('?')[0]}?${params.toString()}`;
-                        navigator.clipboard.writeText(shareUrl);
-                        navigator.share({ title: "Homework Link", text: "Check out this homework link!", url: shareUrl });
+                        navigator.clipboard.writeText(shareUrl());
                         toast.info("Homework link copied!");
                     }}
                 >
-                    <Copy /> Share homework
+                    <Copy className="w-4 h-4" />
+                    <span className="font-medium">Link</span>
+                </Button>
+                <Button
+                    variant="outline"
+                    className="cursor-pointer my-2 flex items-center gap-2 border-blue-500 text-blue-700 hover:bg-blue-50 hover:border-blue-700 transition-all shadow-sm"
+                    onClick={() => {
+                        navigator.share?.({ title: "Homework Link", text: "Check out this homework link!", url: shareUrl() });
+                    }}
+                >
+                    <Share className="w-4 h-4" />
+                    <span className="font-medium">Share</span>
                 </Button>
             </div>
         </div >

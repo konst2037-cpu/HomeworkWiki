@@ -33,7 +33,7 @@ export default function RootLayout({
       >
         <header className="sticky top-0 bg-white z-10 w-full">
           <h1
-            className="text-center text-4xl font-extrabold tracking-tight text-balance py-4 bg-gradient-to-r from-slate-700 via-slate-400 to-slate-700 bg-clip-text text-transparent md:my-2 "
+            className="text-center text-4xl font-extrabold tracking-tight text-balance py-4 bg-gradient-to-r from-blue-700 via-purple-500 to-pink-500 bg-clip-text text-transparent md:my-2"
           >
             <Link href="/">Homework Wiki</Link>
           </h1>

@@ -3,7 +3,7 @@
 import HomeworkComp from "@/components/homework";
 import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
-import { ArrowBigLeft, ArrowBigRight, ArrowLeft, MoveLeft } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, ArrowLeft, MoveLeft, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "./ui/badge";
@@ -53,6 +53,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
         if (filters.class_id) params.append("class_id", filters.class_id.toString());
 
         setLoading(true);
+
         fetch(`/api/v1/homeworks?${params.toString()}`)
             .then(res => res.json())
             .then(data => setHomeworks(data))
@@ -81,42 +82,47 @@ export default function HomeworkListPage({ params }: ListPageProps) {
     };
 
     return (
-        <div>
+        <div className="flex flex-col gap-3">
             <div className="flex items-center gap-10 justify-center md:py-2">
-                <button
+                <Button
                     className="p-2 rounded-full hover:bg-slate-300 transition disabled:opacity-50"
                     onClick={() => handleNavigate(prevDeliveryDate)}
                     disabled={!prevDeliveryDate}
                     aria-label="Previous date"
+                    variant={"outline"}
                 >
                     <ArrowBigLeft className="w-6 h-6 text-slate-600" />
-                </button>
+                </Button>
                 <h3 className="md:text-2xl font-bold text-slate-800 tracking-tight">
                     {currentDate ? getDateFormatted(new Date(currentDate)) : "Loading..."}
                 </h3>
-                <button
+                <Button
                     className="p-2 rounded-full hover:bg-slate-300 transition disabled:opacity-50"
                     onClick={() => handleNavigate(nextDeliveryDate)}
                     disabled={!nextDeliveryDate}
                     aria-label="Next date"
+                    variant={"outline"}
                 >
                     <ArrowBigRight className="w-6 h-6 text-slate-600" />
-                </button>
-            </div>
-            <div className="flex flex-col md:flex-row justify-center items-center gap-3">
-                <span className="text-slate-600 font-medium">
-                    Total homeworks: <Badge>{homeworks.length}</Badge>
-                </span>
-                <Button variant={"outline"}>
-                    <Link
-                        href="/homework/lookup"
-                        className="flex items-center gap-2"
-                    >
-                        <ArrowLeft /> Lookup Homework
-                    </Link>
                 </Button>
             </div>
-            <div className="flex flex-col gap-1 py-4 overflow-y-auto max-h-[60vh]">
+            <div className="flex flex-row justify-center items-center gap-3">
+                <Link href="/homework/lookup" className="md:w-fit">
+                    <Button
+                        variant="default"
+                        className="w-full md:w-fit bg-cyan-500 text-white font-semibold shadow transition-all duration-200 hover:bg-cyan-600 flex items-center gap-2"
+                        style={{ cursor: "pointer" }}
+                    >
+                        <span className="animate-[zoom_1s_ease-in-out_infinite]"><Search /></span>
+                        Lookup Homework
+                    </Button>
+                </Link>
+                <Button className="text-cyan-700 font-medium"
+                    variant={"outline"}>
+                    Total: <Badge className="bg-cyan-500 text-white">{homeworks.length}</Badge>
+                </Button>
+            </div>
+            <div className="flex flex-col gap-1 py-2 overflow-y-auto max-h-[60vh]">
                 {loading ? (
                     <div className="text-slate-500 flex justify-center items-center h-40">Loading...</div>
                 ) : Array.isArray(homeworks) && homeworks.length > 0 ? (

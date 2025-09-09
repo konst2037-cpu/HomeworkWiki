@@ -43,7 +43,9 @@ def create_homework(
     validator: ContentValidator = Depends(ContentValidator),
 ):
     try:
-        response = validator.generate_response(homework.content)
+        response = validator.generate_response(
+            f"Subject: {homework.subject}. Homework: {homework.content}"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
