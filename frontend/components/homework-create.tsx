@@ -148,22 +148,24 @@ export default function HomeworkCreatePage() {
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
                         className="w-full"
+                        maxLength={20}
                     />
                 </div>
                 <div className="flex flex-col md:col-span-2">
-
                     <Textarea
                         placeholder="Enter homework details..."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         className="w-full"
+                        maxLength={100}
                     />
-
                 </div>
                 <div className="flex gap-4 md:col-span-2 justify-end mt-4 items-center">
-                    {loading && (
-                        <LoaderCircle className="animate-spin h-6 w-6 text-primary items-center" />
-                    )}
+                    <Link href="/">
+                        <Button variant="outline" style={{ cursor: "pointer" }} className="font-normal px-10 border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
+                            Cancel
+                        </Button>
+                    </Link>
                     <Button
                         variant="default"
                         className="font-normal px-10"
@@ -172,11 +174,9 @@ export default function HomeworkCreatePage() {
                     >
                         Submit
                     </Button>
-                    <Link href="/">
-                        <Button variant="destructive" style={{ cursor: "pointer" }} className="font-normal px-10">
-                            Cancel
-                        </Button>
-                    </Link>
+                    {loading && (
+                        <LoaderCircle className="animate-spin h-6 w-6 text-primary items-center" />
+                    )}
                 </div>
             </form>
         </div>

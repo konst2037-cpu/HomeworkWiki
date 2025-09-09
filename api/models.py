@@ -16,16 +16,26 @@ class School(SQLModel, table=True):
     name: str = Field(max_length=100)
 
 
+class Grade(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(max_length=50)
+
+
+class Class(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(max_length=50)
+
+
 class Homework(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    subject: str = Field(max_length=100)
+    subject: str = Field(max_length=20)
     delivery_date: date = Field(sa_column=Column(Date))
-    content: str = Field(max_length=1000)
+    content: str = Field(max_length=100)
     user_id: str = Field()
     gpt_reasoning: str | None = Field(default=None, max_length=1000)
     gpt_status: GPTStatus = Field(default=GPTStatus.APPROVED)
     created_date: datetime = Field(default_factory=datetime.now)
     updated_date: datetime = Field(default_factory=datetime.now)
     school_id: int = Field(foreign_key="school.id")
-    grade_id: int = Field()
-    class_id: int = Field()
+    grade_id: int = Field(foreign_key="grade.id")
+    class_id: int = Field(foreign_key="class.id")
