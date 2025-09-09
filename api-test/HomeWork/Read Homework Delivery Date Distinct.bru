@@ -1,0 +1,19 @@
+meta {
+  name: Read Homework Delivery Date Distinct
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{host}}/api/v1/homeworks/stats?group_by=delivery_date&metric=distinct&school_id=1&class_id=1&grade_id=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  group_by: delivery_date
+  metric: distinct
+  school_id: 1
+  class_id: 1
+  grade_id: 1
+}

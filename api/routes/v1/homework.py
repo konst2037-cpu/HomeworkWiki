@@ -95,6 +95,7 @@ def homework_stats(
         "grade_id": Homework.grade_id,
         "class_id": Homework.class_id,
     }
+
     if group_by not in column_map:
         raise HTTPException(status_code=400, detail="Invalid group_by field")
 
@@ -115,10 +116,15 @@ def homework_stats(
                 status_code=400, detail="Missing or invalid field for avg"
             )
         agg = func.avg(column_map[field])
+    elif metric == "distinct":
+        pass
     else:
         raise HTTPException(status_code=400, detail="Unsupported metric")
 
-    stmt = select(group_col, agg).group_by(group_col)
+    if metric == "distinct":
+        stmt = select(group_col).distinct()
+    else:
+        stmt = select(group_col, agg).group_by(group_col)
 
     # Apply filters
     filters = [
@@ -133,6 +139,11 @@ def homework_stats(
 
     results = session.exec(stmt).all()
 
+    if metric == "distinct":
+        results = [g for g in results]
+    else:
+        results = [{group_by: g, metric: v} for g, v in results]
+
     return {
         "group_by": group_by,
         "metric": metric,
@@ -142,7 +153,7 @@ def homework_stats(
             "class_id": class_id,
             "delivery_date": delivery_date,
         },
-        "results": [{group_by: g, metric: v} for g, v in results],
+        "results": results,
     }
 
 

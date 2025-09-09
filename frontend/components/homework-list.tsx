@@ -3,11 +3,12 @@
 import HomeworkComp from "@/components/homework";
 import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
-import { ArrowBigLeft, ArrowBigRight, ArrowLeft, MoveLeft, Search } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 function getDateFormatted(inputDate?: Date) {
     const date = inputDate ?? new Date();
@@ -30,7 +31,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
     const [homeworks, setHomeworks] = React.useState<Homework[]>([]);
     const [deliveryDates, setDeliveryDates] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState(true);
-    const { filters, setFilters } = useFilters();
+    const { filters } = useFilters();
 
     // Get delivery_date from params
     React.useEffect(() => {
@@ -55,23 +56,43 @@ export default function HomeworkListPage({ params }: ListPageProps) {
         setLoading(true);
 
         fetch(`/api/v1/homeworks?${params.toString()}`)
-            .then(res => res.json())
-            .then(data => setHomeworks(data))
-            .catch(err => setHomeworks([]))
+            .then(async res => {
+                if (!res.ok) {
+                    const errorMsg = await res.text();
+                    throw new Error(errorMsg || `HTTP error ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                setHomeworks(data);
+            })
+            .catch(err => {
+                toast.error("Failed to fetch homeworks.");
+                console.error(err);
+                setHomeworks([]);
+            })
             .finally(() => setLoading(false));
     }, [currentDate]);
 
     // Fetch all delivery dates
     React.useEffect(() => {
-        fetch('/api/v1/homeworks')
+
+        const params = new URLSearchParams();
+
+        if (filters.school_id) params.append("school_id", filters.school_id.toString());
+        if (filters.grade_id) params.append("grade_id", filters.grade_id.toString());
+        if (filters.class_id) params.append("class_id", filters.class_id.toString());
+
+        fetch(`/api/v1/homeworks/stats?group_by=delivery_date&metric=distinct&${params.toString()}`)
             .then(res => res.json())
             .then(data => {
-                const dates = Array.from(new Set(data.map((hw: Homework) => hw.delivery_date))) as string[];
-                dates.sort();
+                // const dates = Array.from(new Set(data.results.map((hw: Homework) => hw.delivery_date))) as string[];
+                const dates = data.results;
                 setDeliveryDates(dates);
             })
             .catch(() => setDeliveryDates([]));
     }, []);
+
 
     const currentIndex = deliveryDates.findIndex(date => date === currentDate);
     const prevDeliveryDate = deliveryDates[currentIndex - 1];
