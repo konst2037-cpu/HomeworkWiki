@@ -2,7 +2,6 @@
 
 import { useFilters } from "@/contexts/FilterContext";
 import { cn } from "@/lib/utils";
-import { Homework } from "@/types";
 import React from "react";
 import { toast } from "sonner";
 
@@ -11,8 +10,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Copy, Share } from "lucide-react";
 
+type HomeworkCount = {
+    delivery_date: string;
+    count: number;
+}
+
 export default function HomeworkSearchPage() {
-    const [homeworks, setHomeworks] = React.useState<Homework[]>([]);
+    const [homeworks, setHomeworks] = React.useState<HomeworkCount[]>([]);
     const { filters, setFilters } = useFilters();
     const router = useRouter();
 
@@ -54,12 +58,13 @@ export default function HomeworkSearchPage() {
                 if (filters.school_id) params.set('school_id', filters.school_id.toString());
                 if (filters.grade_id) params.set('grade_id', filters.grade_id.toString());
                 if (filters.class_id) params.set('class_id', filters.class_id.toString());
-                const res = await fetch(`/api/v1/homeworks?${params.toString()}`, { cache: "no-store" });
+                const res = await fetch(`/api/v1/homeworks/stats?${params.toString()}&group_by=delivery_date&metric=count`, { cache: "no-store" });
                 if (!res.ok) {
                     throw new Error('Failed to fetch homeworks');
                 }
                 const data = await res.json();
-                setHomeworks(data);
+                setHomeworks(data.results || []);
+
             } catch (error) {
                 console.log(error);
                 toast.error('Failed to fetch homeworks');
@@ -99,11 +104,12 @@ export default function HomeworkSearchPage() {
 
                         const dayLabel = date.toLocaleDateString("en-US", { month: 'short', day: 'numeric' });
 
-                        const homeworkCount = homeworks?.filter(hw => {
-                            const hwDate = new Date(hw.delivery_date);
-                            hwDate.setHours(0, 0, 0, 0);
-                            return hwDate.getTime() === date.getTime();
-                        }).length || 0;
+                        const homeworkCount =
+                            homeworks.find(hw => {
+                                const hwDate = new Date(hw.delivery_date);
+                                hwDate.setHours(0, 0, 0, 0);
+                                return hwDate.getTime() === date.getTime();
+                            })?.count || 0;
 
                         const isToday = date.getTime() === today.getTime();
                         const isWeekend = date.getDay() === 0 || date.getDay() === 6; // Sunday or Saturday

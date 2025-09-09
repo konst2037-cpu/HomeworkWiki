@@ -1,12 +1,13 @@
 from datetime import date
+from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
 from sqlmodel import select
 
 from api.db import get_session as SessionDep
-from api.models import Homework, GPTStatus
+from api.models import GPTStatus, Homework
 from api.service import ContentValidator
-from fastapi import HTTPException
 
 router = APIRouter(prefix="/v1", tags=["homework"])
 
@@ -62,6 +63,87 @@ def create_homework(
     session.commit()
     session.refresh(homework)
     return homework
+
+
+@router.get(
+    "/homeworks/stats",
+    response_model=dict,
+    status_code=200,
+)
+@router.get("/homeworks/stats")
+def homework_stats(
+    group_by: str = Query(
+        ..., description="Field to group by, e.g. 'delivery_date'"
+    ),
+    metric: str = Query(
+        "count", description="Aggregation metric: count, sum, avg"
+    ),
+    field: Optional[str] = Query(
+        None, description="Field for sum/avg metrics"
+    ),
+    session: SessionDep = Depends(SessionDep),
+    school_id: Optional[int] = Query(None, description="Filter by school_id"),
+    grade_id: Optional[int] = Query(None, description="Filter by grade_id"),
+    class_id: Optional[int] = Query(None, description="Filter by class_id"),
+    delivery_date: Optional[date] = Query(
+        None, description="Filter by delivery_date"
+    ),
+):
+    column_map = {
+        "delivery_date": Homework.delivery_date,
+        "school_id": Homework.school_id,
+        "grade_id": Homework.grade_id,
+        "class_id": Homework.class_id,
+    }
+    if group_by not in column_map:
+        raise HTTPException(status_code=400, detail="Invalid group_by field")
+
+    group_col = column_map[group_by]
+
+    # Select metric
+    if metric == "count":
+        agg = func.count()
+    elif metric == "sum":
+        if not field or field not in column_map:
+            raise HTTPException(
+                status_code=400, detail="Missing or invalid field for sum"
+            )
+        agg = func.sum(column_map[field])
+    elif metric == "avg":
+        if not field or field not in column_map:
+            raise HTTPException(
+                status_code=400, detail="Missing or invalid field for avg"
+            )
+        agg = func.avg(column_map[field])
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported metric")
+
+    stmt = select(group_col, agg).group_by(group_col)
+
+    # Apply filters
+    filters = [
+        (Homework.school_id == school_id) if school_id else None,
+        (Homework.grade_id == grade_id) if grade_id else None,
+        (Homework.class_id == class_id) if class_id else None,
+        (Homework.delivery_date == delivery_date) if delivery_date else None,
+    ]
+    for f in filters:
+        if f is not None:
+            stmt = stmt.where(f)
+
+    results = session.exec(stmt).all()
+
+    return {
+        "group_by": group_by,
+        "metric": metric,
+        "filters": {
+            "school_id": school_id,
+            "grade_id": grade_id,
+            "class_id": class_id,
+            "delivery_date": delivery_date,
+        },
+        "results": [{group_by: g, metric: v} for g, v in results],
+    }
 
 
 @router.get(

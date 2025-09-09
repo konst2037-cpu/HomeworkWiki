@@ -6,9 +6,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 import HomeworkFilters from "./homework-filters";
 import { ClassChar, GradeLevel, School } from "@/types";
-import { Plus, Search, ZoomIn } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useFilters } from "@/contexts/FilterContext";
-import { is } from "date-fns/locale";
 
 
 export default function Home() {

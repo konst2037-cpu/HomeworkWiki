@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from api.models import GPTStatus, Homework, School
+from api.models import GPTStatus, Homework, School, Grade, Class
 
 
 def generate_schools_data():
@@ -11,6 +11,14 @@ def generate_schools_data():
         School(name="Hilltop School"),
         School(name="Maple Leaf School"),
     ]
+
+
+def generate_grades_data():
+    return [Grade(name=i) for i in range(1, 13)]
+
+
+def generate_classes_data():
+    return [Class(name=c.lower()) for c in ["A", "B", "C", "D", "E", "F"]]
 
 
 def generate_homework_data(school_ids, total=100, same_date_count=20):
