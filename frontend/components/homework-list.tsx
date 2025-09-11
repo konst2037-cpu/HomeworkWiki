@@ -181,32 +181,9 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     <ArrowBigRight className="w-6 h-6 text-slate-600" />
                 </Button>
             </div>
-            <div className="flex flex-col md:flex-row justify-between items-center md:gap-3">
-                <Link href="/homework/lookup" className="md:w-fit">
-                    <Button
-                        variant="default"
-                        className="w-full md:w-fit bg-cyan-500 text-white font-semibold shadow transition-all duration-200 hover:bg-cyan-600 flex items-center gap-2"
-                        style={{ cursor: "pointer" }}
-                    >
-                        <span className="animate-[zoom_1s_ease-in-out_infinite]"><Search /></span>
-                        Lookup Homework
-                    </Button>
-                </Link>
-
+            <div className="flex flex-col md:flex-row justify-between items-center md:gap-3 w-full">
                 {homeworkCount > limit && (
-                    <div className="flex justify-between items-center gap-4 py-2">
-                        {/* <Select>
-                        <SelectTrigger>
-                            <SelectValue placeholder={"Select a limit"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectItem value="10" onClick={() => { setLimit(10); setOffset(0) }}>10</SelectItem>
-                                <SelectItem value="25" onClick={() => { setLimit(25); setOffset(0) }}>25</SelectItem>
-                                <SelectItem value="50" onClick={() => { setLimit(50); setOffset(0) }}>50</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select> */}
+                    <div className="flex justify-center md:justify-between items-center gap-4 py-2">
                         <div className="inline-flex rounded-md gap-2" role="group">
                             <Button
                                 variant="outline"
@@ -242,10 +219,23 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     </div>
                 )}
 
-                <Button className="text-cyan-700 font-medium"
-                    variant={"outline"}>
-                    Total: <Badge className="bg-cyan-500 text-white">{homeworkCount}</Badge>
-                </Button>
+                <div className="flex gap-2 justify-between w-full md:w-auto">
+                    <Link href="/homework/lookup" className="md:w-fit">
+                        <Button
+                            variant="default"
+                            className="w-full md:w-fit bg-cyan-500 text-white font-semibold shadow transition-all duration-200 hover:bg-cyan-600 flex items-center gap-2"
+                            style={{ cursor: "pointer" }}
+                        >
+                            <span className="animate-[zoom_1s_ease-in-out_infinite]"><Search /></span>
+                            Lookup Homework
+                        </Button>
+                    </Link>
+
+                    <Button className="text-cyan-700 font-medium"
+                        variant={"outline"}>
+                        Total: <Badge className="bg-cyan-500 text-white">{homeworkCount}</Badge>
+                    </Button>
+                </div>
 
             </div>
             {/* <div className="flex flex-col gap-1 py-2 overflow-y-auto max-h-[60vh]">
