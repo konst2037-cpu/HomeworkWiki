@@ -2,7 +2,7 @@
 
 import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
-import { ArrowBigLeft, ArrowBigRight, ChevronLeft, ChevronRight, EllipsisVertical, Search } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, BookCheck, BookX, ChevronLeft, ChevronRight, EllipsisVertical, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "./ui/badge";
@@ -283,8 +283,8 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                                             <PopoverTrigger asChild>
                                                 <EllipsisVertical />
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto">
-                                                <div className="flex flex-col gap-2">
+                                            <PopoverContent className="w-auto p-1">
+                                                <div className="flex flex-col gap-1">
                                                     <Button
                                                         variant="ghost"
                                                         className="justify-start w-full text-green-600 hover:bg-green-50"
@@ -293,7 +293,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                                                         }
                                                         aria-label="Mark as Finished"
                                                     >
-                                                        <Label className="cursor-pointer">✅ Finished</Label>
+                                                        <Label className="cursor-pointer"><BookCheck /> Finished</Label>
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
@@ -303,7 +303,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                                                         }
                                                         aria-label="Mark as False"
                                                     >
-                                                        <Label className="cursor-pointer">❌ False</Label>
+                                                        <Label className="cursor-pointer"><BookX /> False</Label>
                                                     </Button>
                                                 </div>
                                             </PopoverContent>
