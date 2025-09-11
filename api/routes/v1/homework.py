@@ -70,10 +70,9 @@ def create_homework(
     response_model=dict,
     status_code=200,
 )
-@router.get("/homeworks/stats")
 def homework_stats(
-    group_by: str = Query(
-        ..., description="Field to group by, e.g. 'delivery_date'"
+    group_by: Optional[str] = Query(
+        None, description="Field to group by, e.g. 'delivery_date'"
     ),
     metric: str = Query(
         "count", description="Aggregation metric: count, sum, avg"
@@ -96,10 +95,13 @@ def homework_stats(
         "class_id": Homework.class_id,
     }
 
-    if group_by not in column_map:
-        raise HTTPException(status_code=400, detail="Invalid group_by field")
+    if group_by is not None:
+        if group_by not in column_map:
+            raise HTTPException(
+                status_code=400, detail="Invalid group_by field"
+            )
 
-    group_col = column_map[group_by]
+        group_col = column_map[group_by]
 
     # Select metric
     if metric == "count":
@@ -124,7 +126,10 @@ def homework_stats(
     if metric == "distinct":
         stmt = select(group_col).distinct()
     else:
-        stmt = select(group_col, agg).group_by(group_col)
+        if group_by:
+            stmt = select(group_col, agg).group_by(group_col)
+        else:
+            stmt = select(agg)
 
     # Apply filters
     filters = [
@@ -142,8 +147,10 @@ def homework_stats(
     if metric == "distinct":
         results = [g for g in results]
     else:
-        results = [{group_by: g, metric: v} for g, v in results]
-
+        if group_by:
+            results = [{group_by: g, metric: v} for g, v in results]
+        else:
+            results = [{metric: results[0]}] if results else []
     return {
         "group_by": group_by,
         "metric": metric,

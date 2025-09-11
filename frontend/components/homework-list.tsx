@@ -1,14 +1,24 @@
 'use client'
 
-import HomeworkComp from "@/components/homework";
 import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
-import { ArrowBigLeft, ArrowBigRight, Search } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, ChevronLeft, ChevronRight, EllipsisVertical, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "./ui/label";
+import { cn } from "@/lib/utils";
 
 function getDateFormatted(inputDate?: Date) {
     const date = inputDate ?? new Date();
@@ -32,6 +42,19 @@ export default function HomeworkListPage({ params }: ListPageProps) {
     const [deliveryDates, setDeliveryDates] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState(true);
     const { filters } = useFilters();
+    const [offset, setOffset] = React.useState(0);
+    const [limit, setLimit] = React.useState(10);
+    const [homeworkCount, setHomeworkCount] = React.useState(0);
+    const [statusMap, setStatusMap] = React.useState<{ [key: string]: "finish" | "false" }>({});
+
+    // Load homework status from localStorage
+    React.useEffect(() => {
+        const storedStatus = localStorage.getItem("homework_status");
+        if (storedStatus) {
+            setStatusMap(JSON.parse(storedStatus));
+        }
+    }, []);
+
 
     // Get delivery_date from params
     React.useEffect(() => {
@@ -52,8 +75,8 @@ export default function HomeworkListPage({ params }: ListPageProps) {
         if (filters.school_id) params.append("school_id", filters.school_id.toString());
         if (filters.grade_id) params.append("grade_id", filters.grade_id.toString());
         if (filters.class_id) params.append("class_id", filters.class_id.toString());
-
-        setLoading(true);
+        params.append("offset", offset.toString());
+        params.append("limit", limit.toString());
 
         fetch(`/api/v1/homeworks?${params.toString()}`)
             .then(async res => {
@@ -72,7 +95,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                 setHomeworks([]);
             })
             .finally(() => setLoading(false));
-    }, [currentDate]);
+    }, [currentDate, offset, limit, filters]);
 
     // Fetch all delivery dates
     React.useEffect(() => {
@@ -93,6 +116,26 @@ export default function HomeworkListPage({ params }: ListPageProps) {
             .catch(() => setDeliveryDates([]));
     }, []);
 
+    // Fetch all delivery dates
+    React.useEffect(() => {
+        if (!currentDate) return;
+
+        const params = new URLSearchParams();
+
+        if (filters.school_id) params.append("school_id", filters.school_id.toString());
+        if (filters.grade_id) params.append("grade_id", filters.grade_id.toString());
+        if (filters.class_id) params.append("class_id", filters.class_id.toString());
+        params.append("metric", "count");
+        params.append("delivery_date", currentDate);
+
+        fetch(`/api/v1/homeworks/stats?${params.toString()}`)
+            .then(res => res.json())
+            .then(data => {
+                setHomeworkCount(data.results[0]?.count || 0);
+            })
+            .catch(() => setHomeworkCount(0));
+    }, [currentDate, filters]);
+
 
     const currentIndex = deliveryDates.findIndex(date => date === currentDate);
     const prevDeliveryDate = deliveryDates[currentIndex - 1];
@@ -102,9 +145,20 @@ export default function HomeworkListPage({ params }: ListPageProps) {
         if (date) setCurrentDate(date);
     };
 
+    function setHomeworkStatus(id: string, status: "finish" | "false") {
+        if (status !== null) {
+            const prev = JSON.parse(localStorage.getItem('homework_status') || '{}');
+            localStorage.setItem(
+                'homework_status',
+                JSON.stringify({ ...prev, [id]: status })
+            );
+            setStatusMap({ ...statusMap, [id]: status });
+        }
+    }
+
     return (
-        <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-10 justify-center md:py-2">
+        <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-10 justify-between">
                 <Button
                     className="p-2 rounded-full hover:bg-slate-300 transition disabled:opacity-50"
                     onClick={() => handleNavigate(prevDeliveryDate)}
@@ -127,7 +181,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     <ArrowBigRight className="w-6 h-6 text-slate-600" />
                 </Button>
             </div>
-            <div className="flex flex-row justify-center items-center gap-3">
+            <div className="flex flex-col md:flex-row justify-between items-center md:gap-3">
                 <Link href="/homework/lookup" className="md:w-fit">
                     <Button
                         variant="default"
@@ -138,12 +192,63 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                         Lookup Homework
                     </Button>
                 </Link>
+
+                {homeworkCount > limit && (
+                    <div className="flex justify-between items-center gap-4 py-2">
+                        {/* <Select>
+                        <SelectTrigger>
+                            <SelectValue placeholder={"Select a limit"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem value="10" onClick={() => { setLimit(10); setOffset(0) }}>10</SelectItem>
+                                <SelectItem value="25" onClick={() => { setLimit(25); setOffset(0) }}>25</SelectItem>
+                                <SelectItem value="50" onClick={() => { setLimit(50); setOffset(0) }}>50</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select> */}
+                        <div className="inline-flex rounded-md gap-2" role="group">
+                            <Button
+                                variant="outline"
+                                disabled={offset === 0}
+                                onClick={() => setOffset(prev => Math.max(prev - limit, 0))}
+                                className="rounded-l-md"
+                            >
+                                <ChevronLeft />
+                            </Button>
+                            {Array.from({ length: Math.ceil(homeworkCount / limit) }, (_, i) => (
+                                <Button
+                                    key={i}
+                                    variant={offset / limit === i ? "default" : "outline"}
+                                    onClick={() => setOffset(i * limit)}
+                                    className={`px-3 ${i === 0 ? "" : "-ml-px"} ${i === Math.ceil(homeworkCount / limit) - 1 ? "rounded-r-md" : ""}`}
+                                    disabled={offset / limit === i}
+                                >
+                                    {i + 1}
+                                </Button>
+                            ))}
+                            <Button
+                                variant="outline"
+                                disabled={offset + limit >= homeworkCount}
+                                onClick={() => setOffset(prev => prev + limit)}
+                                className="rounded-r-md -ml-px"
+                            >
+                                <ChevronRight />
+                            </Button>
+                        </div>
+                        <span className="text-slate-600 text-sm">
+                            Page {Math.floor(offset / limit) + 1} of {Math.max(1, Math.ceil(homeworkCount / limit))}
+                        </span>
+                    </div>
+                )}
+
                 <Button className="text-cyan-700 font-medium"
                     variant={"outline"}>
-                    Total: <Badge className="bg-cyan-500 text-white">{homeworks.length}</Badge>
+                    Total: <Badge className="bg-cyan-500 text-white">{homeworkCount}</Badge>
                 </Button>
+
             </div>
-            <div className="flex flex-col gap-1 py-2 overflow-y-auto max-h-[60vh]">
+            {/* <div className="flex flex-col gap-1 py-2 overflow-y-auto max-h-[60vh]">
                 {loading ? (
                     <div className="text-slate-500 flex justify-center items-center h-40">Loading...</div>
                 ) : Array.isArray(homeworks) && homeworks.length > 0 ? (
@@ -154,6 +259,71 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                 ) : (
                     <div className="text-slate-500 flex justify-center items-center h-40">No homework found.</div>
                 )}
+            </div> */}
+
+            <div className="overflow-hidden rounded-md border">
+                <Table className="table-fixed w-full">
+                    <TableHeader className="sticky top-0 bg-white z-10">
+                        <TableRow>
+                            <TableHead>Subject</TableHead>
+                            <TableHead className="text-center">Content</TableHead>
+                            <TableHead></TableHead>
+                        </TableRow>
+                    </TableHeader>
+                </Table>
+                {/* 👇 Scrollable body */}
+                <div className="max-h-[400px] overflow-y-auto">
+                    <Table className="table-fixed w-full">
+                        <TableBody>
+                            {homeworks.map((hw) => (
+                                <TableRow
+                                    key={hw.id}
+                                    className={cn(
+                                        statusMap[hw.id] === "finish" && "bg-green-50",
+                                        statusMap[hw.id] === "false" && "bg-red-50"
+                                    )}
+                                >
+                                    <TableCell className="font-medium">{hw.subject}</TableCell>
+                                    <TableCell>{hw.content}</TableCell>
+                                    <TableCell
+                                        style={{ width: "40px", minWidth: "40px", maxWidth: "60px" }}
+                                        className="justify-end"
+                                    >
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <EllipsisVertical />
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto">
+                                                <div className="flex flex-col gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="justify-start w-full text-green-600 hover:bg-green-50"
+                                                        onClick={() =>
+                                                            setHomeworkStatus(hw.id.toString(), "finish")
+                                                        }
+                                                        aria-label="Mark as Finished"
+                                                    >
+                                                        <Label className="cursor-pointer">✅ Finished</Label>
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="justify-start w-full text-red-600 hover:bg-red-50"
+                                                        onClick={() =>
+                                                            setHomeworkStatus(hw.id.toString(), "false")
+                                                        }
+                                                        aria-label="Mark as False"
+                                                    >
+                                                        <Label className="cursor-pointer">❌ False</Label>
+                                                    </Button>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     );

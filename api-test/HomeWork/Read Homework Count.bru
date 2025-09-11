@@ -1,19 +1,19 @@
 meta {
   name: Read Homework Count
   type: http
-  seq: 7
+  seq: 9
 }
 
 get {
-  url: {{host}}/api/v1/homeworks/stats?group_by=delivery_date&metric=count&school_id=1&class_id=1&grade_id=1
+  url: {{host}}/api/v1/homeworks/stats?metric=count&school_id=1&class_id=1&grade_id=1&delivery_date=2025-09-11
   body: none
   auth: inherit
 }
 
 params:query {
-  group_by: delivery_date
   metric: count
   school_id: 1
   class_id: 1
   grade_id: 1
+  delivery_date: 2025-09-11
 }
