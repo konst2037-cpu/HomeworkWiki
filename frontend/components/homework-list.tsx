@@ -43,7 +43,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
     const [loading, setLoading] = React.useState(true);
     const { filters } = useFilters();
     const [offset, setOffset] = React.useState(0);
-    const [limit, setLimit] = React.useState(10);
+    const [limit, setLimit] = React.useState(50);
     const [homeworkCount, setHomeworkCount] = React.useState(0);
     const [statusMap, setStatusMap] = React.useState<{ [key: string]: "finish" | "false" }>({});
 
@@ -193,17 +193,59 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                             >
                                 <ChevronLeft />
                             </Button>
-                            {Array.from({ length: Math.ceil(homeworkCount / limit) }, (_, i) => (
-                                <Button
-                                    key={i}
-                                    variant={offset / limit === i ? "default" : "outline"}
-                                    onClick={() => setOffset(i * limit)}
-                                    className={`px-3 ${i === 0 ? "" : "-ml-px"} ${i === Math.ceil(homeworkCount / limit) - 1 ? "rounded-r-md" : ""}`}
-                                    disabled={offset / limit === i}
-                                >
-                                    {i + 1}
-                                </Button>
-                            ))}
+                            {homeworkCount / limit > 4 ? (
+                                <>
+                                    <Button
+                                        variant={offset / limit === 0 ? "default" : "outline"}
+                                        onClick={() => setOffset(0)}
+                                        className="px-3"
+                                        disabled={offset / limit === 0}
+                                    >
+                                        1
+                                    </Button>
+                                    {/* {offset / limit > 3 && <span className="px-2">...</span>} */}
+                                    {Array.from({ length: Math.min(2, Math.ceil(homeworkCount / limit) - 2) }, (_, idx) => {
+
+                                        const page = Math.max(3, offset / limit - 2) + idx;
+
+                                        // -1 to avoid duplicate number in page button
+                                        if (page >= Math.ceil(homeworkCount / limit) - 1) return null;
+
+                                        return (
+                                            <Button
+                                                key={page}
+                                                variant={offset / limit === page ? "default" : "outline"}
+                                                onClick={() => setOffset(page * limit)}
+                                                className={`px-3 -ml-px`}
+                                                disabled={offset / limit === page}
+                                            >
+                                                {page + 1}
+                                            </Button>
+                                        );
+                                    })}
+                                    {/* {offset / limit < Math.ceil(homeworkCount / limit) - 4 && <span className="px-2">...</span>} */}
+                                    <Button
+                                        variant={offset / limit === Math.ceil(homeworkCount / limit) - 1 ? "default" : "outline"}
+                                        onClick={() => setOffset((Math.ceil(homeworkCount / limit) - 1) * limit)}
+                                        className="px-3 -ml-px rounded-r-md"
+                                        disabled={offset / limit === Math.ceil(homeworkCount / limit) - 1}
+                                    >
+                                        {Math.ceil(homeworkCount / limit)}
+                                    </Button>
+                                </>
+                            ) : (
+                                Array.from({ length: Math.ceil(homeworkCount / limit) }, (_, i) => (
+                                    <Button
+                                        key={i}
+                                        variant={offset / limit === i ? "default" : "outline"}
+                                        onClick={() => setOffset(i * limit)}
+                                        className={`px-3 ${i === 0 ? "" : "-ml-px"} ${i === Math.ceil(homeworkCount / limit) - 1 ? "rounded-r-md" : ""}`}
+                                        disabled={offset / limit === i}
+                                    >
+                                        {i + 1}
+                                    </Button>
+                                ))
+                            )}
                             <Button
                                 variant="outline"
                                 disabled={offset + limit >= homeworkCount}
@@ -213,6 +255,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                                 <ChevronRight />
                             </Button>
                         </div>
+
                         <span className="text-slate-600 text-sm">
                             Page {Math.floor(offset / limit) + 1} of {Math.max(1, Math.ceil(homeworkCount / limit))}
                         </span>
@@ -255,15 +298,14 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                 <Table className="table-fixed w-full">
                     <TableHeader className="sticky top-0 bg-white z-10">
                         <TableRow>
-                            <TableHead>Subject</TableHead>
-                            <TableHead className="text-center">Content</TableHead>
-                            <TableHead></TableHead>
+                            <TableHead className="w-[12vw] max-w-[120px]">Subject</TableHead>
+                            <TableHead className="w-[40vw]">Content</TableHead>
+                            <TableHead className="text-right w-[7vw] max-w-[120px]"></TableHead>
                         </TableRow>
                     </TableHeader>
                 </Table>
-                {/* 👇 Scrollable body */}
-                <div className="max-h-[400px] overflow-y-auto">
-                    <Table className="table-fixed w-full">
+                <div className="overflow-y-auto md:max-h-[60vh] max-h-[45vh]">
+                    <Table>
                         <TableBody>
                             {homeworks.map((hw) => (
                                 <TableRow
@@ -273,41 +315,40 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                                         statusMap[hw.id] === "false" && "bg-red-50"
                                     )}
                                 >
-                                    <TableCell className="font-medium">{hw.subject}</TableCell>
-                                    <TableCell>{hw.content}</TableCell>
-                                    <TableCell
-                                        style={{ width: "40px", minWidth: "40px", maxWidth: "60px" }}
-                                        className="justify-end"
-                                    >
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <EllipsisVertical />
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-1">
-                                                <div className="flex flex-col gap-1">
-                                                    <Button
-                                                        variant="ghost"
-                                                        className="justify-start w-full text-green-600 hover:bg-green-50"
-                                                        onClick={() =>
-                                                            setHomeworkStatus(hw.id.toString(), "finish")
-                                                        }
-                                                        aria-label="Mark as Finished"
-                                                    >
-                                                        <Label className="cursor-pointer"><BookCheck /> Finished</Label>
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        className="justify-start w-full text-red-600 hover:bg-red-50"
-                                                        onClick={() =>
-                                                            setHomeworkStatus(hw.id.toString(), "false")
-                                                        }
-                                                        aria-label="Mark as False"
-                                                    >
-                                                        <Label className="cursor-pointer"><BookX /> False</Label>
-                                                    </Button>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
+                                    <TableCell className="font-medium w-[12vw] max-w-[120px] truncate">{hw.subject}</TableCell>
+                                    <TableCell className="whitespace-normal w-[40vw]">{hw.content}</TableCell>
+                                    <TableCell className="text-right w-[7vw] max-w-[120px]">
+                                        <div className="flex justify-end">
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <EllipsisVertical />
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-1">
+                                                    <div className="flex flex-col gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            className="w-full text-green-600 hover:bg-green-50"
+                                                            onClick={() =>
+                                                                setHomeworkStatus(hw.id.toString(), "finish")
+                                                            }
+                                                            aria-label="Mark as Finished"
+                                                        >
+                                                            <Label className="cursor-pointer"><BookCheck /> Finished</Label>
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            className="justify-start w-full text-red-600 hover:bg-red-50"
+                                                            onClick={() =>
+                                                                setHomeworkStatus(hw.id.toString(), "false")
+                                                            }
+                                                            aria-label="Mark as False"
+                                                        >
+                                                            <Label className="cursor-pointer"><BookX /> False</Label>
+                                                        </Button>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -315,6 +356,6 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     </Table>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
