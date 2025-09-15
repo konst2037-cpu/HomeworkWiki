@@ -19,6 +19,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
+import { ShareButton } from "./share";
 
 function getDateFormatted(inputDate?: Date) {
     const date = inputDate ?? new Date();
@@ -356,6 +357,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                     </Table>
                 </div>
             </div>
+            <ShareButton />
         </div >
     );
 }

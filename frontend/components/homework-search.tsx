@@ -7,8 +7,7 @@ import { toast } from "sonner";
 
 
 import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
-import { Copy, Share } from "lucide-react";
+import { ShareButton } from "./share";
 
 type HomeworkCount = {
     delivery_date: string;
@@ -20,16 +19,16 @@ export default function HomeworkSearchPage() {
     const { filters, setFilters } = useFilters();
     const router = useRouter();
 
-    const shareUrl = (() => {
-        const currentUrl = window.location.href;
-        const params = new URLSearchParams();
-        if (filters.school_id) params.set('school_id', filters.school_id.toString());
-        if (filters.grade_id) params.set('grade_id', filters.grade_id.toString());
-        if (filters.class_id) params.set('class_id', filters.class_id.toString());
-        if (filters.className) params.set('class', filters.className.toString());
-        if (filters.schoolName) params.set('school', filters.schoolName.toString());
-        return `${currentUrl.split('?')[0]}?${params.toString()}`;
-    });
+    // const shareUrl = (() => {
+    //     const currentUrl = window.location.href;
+    //     const params = new URLSearchParams();
+    //     if (filters.school_id) params.set('school_id', filters.school_id.toString());
+    //     if (filters.grade_id) params.set('grade_id', filters.grade_id.toString());
+    //     if (filters.class_id) params.set('class_id', filters.class_id.toString());
+    //     if (filters.className) params.set('class', filters.className.toString());
+    //     if (filters.schoolName) params.set('school', filters.schoolName.toString());
+    //     return `${currentUrl.split('?')[0]}?${params.toString()}`;
+    // });
 
     // Set all filters from shared link parameters on page load.
     // This allows users to view homeworks directly without manually selecting school, grade, or class.
@@ -141,7 +140,7 @@ export default function HomeworkSearchPage() {
                     });
                 })()}
             </div>
-            <div className="flex justify-end w-full md:max-w-4xl gap-2">
+            {/* <div className="flex justify-end w-full md:max-w-4xl gap-2">
                 <Button
                     variant="outline"
                     className="cursor-pointer my-2 flex items-center gap-2 border-blue-500 text-blue-700 hover:bg-blue-50 hover:border-blue-700 transition-all shadow-sm"
@@ -163,7 +162,8 @@ export default function HomeworkSearchPage() {
                     <Share className="w-4 h-4" />
                     <span className="font-medium">Share</span>
                 </Button>
-            </div>
+            </div> */}
+            <ShareButton />
         </div >
     );
 }
