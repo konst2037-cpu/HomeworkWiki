@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Depends, Query
-from sqlmodel import select
+from sqlmodel import select, Session
 
-from api.db import get_session as SessionDep
+from api.db import get_session
 from api.models import Grade
 
 
-router = APIRouter(prefix="/v1", tags=["grade"])
+router = APIRouter(prefix='/v1', tags=['grade'])
 
 
-@router.get("/grades", response_model=list[Grade], status_code=200)
+@router.get('/grades', response_model=list[Grade], status_code=200)
 def read_grades(
-    session: SessionDep = Depends(SessionDep),
+    session: Session = Depends(get_session),
     offset: int = 0,
     limit: int = Query(default=None, le=100),
 ):

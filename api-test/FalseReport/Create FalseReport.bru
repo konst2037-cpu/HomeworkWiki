@@ -1,0 +1,18 @@
+meta {
+  name: Create FalseReport
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/api/v1/false_reports
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "user_id": "user1",
+    "homework_id": 1,
+  }
+}

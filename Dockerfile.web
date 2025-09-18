@@ -1,20 +1,20 @@
-# Use official Node.js image as base
+# Use official Node.js image
 FROM node:20-bullseye
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
+COPY frontend/package*.json ./
 RUN npm ci
 
-# Copy application source
-COPY . .
+COPY ./frontend .
 
-# Build the app (if using TypeScript or build step)
-# RUN npm run build
+# Accept build-time variable
+ARG NEXT_PUBLIC_API_URL
+# Persist it as environment variable for runtime
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
-# Expose port (change if your app uses a different port)
+# Build Next.js app
+RUN npm run build
+
 EXPOSE 3000
+CMD ["npm", "start"]

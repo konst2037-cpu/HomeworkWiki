@@ -2,7 +2,7 @@
 
 import { useFilters } from "@/contexts/FilterContext";
 import { Homework } from "@/types";
-import { ArrowBigLeft, ArrowBigRight, BookCheck, BookX, ChevronLeft, ChevronRight, EllipsisVertical, Search } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "./ui/badge";
@@ -16,10 +16,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { ShareButton } from "./share";
+import { HomeworkActions } from "./homework-actions";
 
 function getDateFormatted(inputDate?: Date) {
     const date = inputDate ?? new Date();
@@ -146,16 +145,6 @@ export default function HomeworkListPage({ params }: ListPageProps) {
         if (date) setCurrentDate(date);
     };
 
-    function setHomeworkStatus(id: string, status: "finish" | "false") {
-        if (status !== null) {
-            const prev = JSON.parse(localStorage.getItem('homework_status') || '{}');
-            localStorage.setItem(
-                'homework_status',
-                JSON.stringify({ ...prev, [id]: status })
-            );
-            setStatusMap({ ...statusMap, [id]: status });
-        }
-    }
 
     return (
         <div className="flex flex-col gap-1">
@@ -319,37 +308,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
                                     <TableCell className="font-medium w-[12vw] max-w-[120px] truncate">{hw.subject}</TableCell>
                                     <TableCell className="whitespace-normal w-[40vw]">{hw.content}</TableCell>
                                     <TableCell className="text-right w-[7vw] max-w-[120px]">
-                                        <div className="flex justify-end">
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <EllipsisVertical />
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-1">
-                                                    <div className="flex flex-col gap-1">
-                                                        <Button
-                                                            variant="ghost"
-                                                            className="w-full text-green-600 hover:bg-green-50"
-                                                            onClick={() =>
-                                                                setHomeworkStatus(hw.id.toString(), "finish")
-                                                            }
-                                                            aria-label="Mark as Finished"
-                                                        >
-                                                            <Label className="cursor-pointer"><BookCheck /> Finished</Label>
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            className="justify-start w-full text-red-600 hover:bg-red-50"
-                                                            onClick={() =>
-                                                                setHomeworkStatus(hw.id.toString(), "false")
-                                                            }
-                                                            aria-label="Mark as False"
-                                                        >
-                                                            <Label className="cursor-pointer"><BookX /> False</Label>
-                                                        </Button>
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
-                                        </div>
+                                        <HomeworkActions homework={hw} statusMap={statusMap} setStatusMap={setStatusMap} />
                                     </TableCell>
                                 </TableRow>
                             ))}

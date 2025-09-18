@@ -1,36 +1,39 @@
 from datetime import datetime, timedelta
+from typing import List
 
-from api.models import GPTStatus, Homework, School, Grade, Class
+from api.models import Class, GPTStatus, Grade, Homework, School
 
 
 def generate_schools_data():
     return [
-        School(name="Greenwood High"),
-        School(name="Riverdale Academy"),
-        School(name="Sunrise Public School"),
-        School(name="Hilltop School"),
-        School(name="Maple Leaf School"),
+        School(name='Greenwood High'),
+        School(name='Riverdale Academy'),
+        School(name='Sunrise Public School'),
+        School(name='Hilltop School'),
+        School(name='Maple Leaf School'),
     ]
 
 
 def generate_grades_data():
-    return [Grade(name=i) for i in range(1, 13)]
+    return [Grade(name=str(i)) for i in range(1, 13)]
 
 
 def generate_classes_data():
-    return [Class(name=c.lower()) for c in ["A", "B", "C", "D", "E", "F"]]
+    return [Class(name=c.lower()) for c in ['A', 'B', 'C', 'D', 'E', 'F']]
 
 
-def generate_homework_data(school_ids, total=100, same_date_count=20):
-    homework_data = []
+def generate_homework_data(
+    school_ids: List[int], total: int = 100, same_date_count: int = 20
+) -> List[Homework]:
+    homework_data: List[Homework] = []
     today = datetime.now()
-    user_ids = ["user1", "user2", "user3"]  # Example user IDs
-    subjects = ["Math", "Science", "History", "English"]
+    user_ids = ['user1', 'user2', 'user3']  # Example user IDs
+    subjects = ['Math', 'Science', 'History', 'English']
     contents = [
-        "Algebra exercises",
-        "Physics lab",
-        "World War II essay",
-        "Poetry analysis",
+        'Algebra exercises',
+        'Physics lab',
+        'World War II essay',
+        'Poetry analysis',
     ]
     grade_levels = [i for i in range(1, 13)]
     class_ids = [i for i in range(1, 7)]
@@ -50,7 +53,7 @@ def generate_homework_data(school_ids, total=100, same_date_count=20):
                 school_id=school_ids[i % len(school_ids)],
                 grade_id=grade_levels[i % len(grade_levels)],
                 class_id=class_ids[i % len(class_ids)],
-                gpt_reasoning="Relevant to curriculum",
+                gpt_reasoning='Relevant to curriculum',
                 gpt_status=GPTStatus.APPROVED,
             )
         )
@@ -67,7 +70,7 @@ def generate_homework_data(school_ids, total=100, same_date_count=20):
                 school_id=school_ids[i % len(school_ids)],
                 grade_id=grade_levels[i % len(grade_levels)],
                 class_id=class_ids[i % len(class_ids)],
-                gpt_reasoning="Relevant to curriculum",
+                gpt_reasoning='Relevant to curriculum',
                 gpt_status=GPTStatus.APPROVED,
             )
         )
