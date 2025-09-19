@@ -42,7 +42,9 @@ export default function Home() {
   React.useEffect(() => {
     async function fetchSchools() {
       try {
-        const res = await fetch("/api/v1/schools", { cache: "no-store" });
+        const res = await fetch("/api/v1/schools?limit=20", {
+          cache: "no-store",
+        });
         if (!res.ok) {
           throw new Error("Failed to fetch schools");
         }
@@ -138,7 +140,12 @@ export default function Home() {
   return (
     <div className="md:h-full flex flex-col gap-5 mt-5">
       <div className="flex flex-col flex-wrap gap-2 md:gap-3 items-center md:justify-center">
-        <HomeworkFilters schools={schools} grades={grades} classes={classes} />
+        <HomeworkFilters
+          grades={grades}
+          classes={classes}
+          schools={schools}
+          setSchools={setSchools}
+        />
         <div className="flex flex-col md:flex-row gap-2 w-full md:w-1/3 items-center mt-3">
           {isFiltered ? (
             <>

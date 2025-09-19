@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
-from sqlmodel import select, Session
+from sqlmodel import Session, select
 
 from api.db import get_session as SessionDep
 from api.models import School
@@ -12,10 +12,14 @@ router = APIRouter(prefix='/v1', tags=['school'])
 @router.get('/schools', response_model=list[School], status_code=200)
 def read_schools(
     session: Session = Depends(SessionDep),
+    q: str | None = Query(None, description='Search term for school name'),
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 10,
 ):
-    schools = session.exec(select(School).offset(offset).limit(limit)).all()
+    stmt = select(School)
+    if q:
+        stmt = stmt.where(School.name.ilike(f'%{q}%'))  # type: ignore
+    schools = session.exec(stmt.offset(offset).limit(limit)).all()
     return schools
 
 

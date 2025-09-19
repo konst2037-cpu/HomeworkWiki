@@ -20,12 +20,14 @@ import { useFilters } from "@/contexts/FilterContext";
 
 interface HomeworkFiltersProps {
   schools: School[];
+  setSchools: React.Dispatch<React.SetStateAction<School[]>>;
   grades: GradeLevel[];
   classes: ClassChar[];
 }
 
 export default function HomeworkFilters({
   schools,
+  setSchools,
   grades,
   classes,
 }: HomeworkFiltersProps) {
@@ -37,8 +39,32 @@ export default function HomeworkFilters({
   const [classSection, setClassSection] = React.useState<string | null>(null);
   const [schoolId, setSchoolId] = React.useState<number | null>(null);
   const [classId, setClassId] = React.useState<number | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
   const { setFilters } = useFilters();
+
+  // debounce search (300ms)
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const searchSchools = (query: string) => {
+    clearTimeout(timeoutRef.current ?? undefined);
+    timeoutRef.current = setTimeout(async () => {
+      if (!query) {
+        setSchools([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `/api/v1/schools?q=${encodeURIComponent(query)}&limit=25`,
+        );
+        const data = await res.json();
+        setSchools(data);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+  };
 
   const setLocalStorageItem = (key: string, value: string) => {
     localStorage.setItem(key, value);
@@ -84,21 +110,22 @@ export default function HomeworkFilters({
             aria-expanded={openSchool}
             className="w-full md:min-w-1/2 md:max-w-fit justify-between"
           >
-            {schoolName
-              ? schools.find((sch) => sch.name === schoolName)?.name
-              : "Select School"}
+            {schoolName || "Select School"}
             <ChevronsUpDown className="opacity-50 ml-2" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full sm:w-[220px] md:w-[240px] p-0">
-          <Command>
+          <Command shouldFilter={false}>
             <CommandInput
               placeholder="Search school..."
               className="h-9"
               required
+              onValueChange={searchSchools}
             />
             <CommandList>
-              <CommandEmpty>No school found.</CommandEmpty>
+              <CommandEmpty>
+                {loading ? "Loading..." : "No schools found."}
+              </CommandEmpty>
               <CommandGroup>
                 {schools?.map((sch) => (
                   <CommandItem
