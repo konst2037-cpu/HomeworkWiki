@@ -2,6 +2,16 @@
 
 ## Getting Started
 
+### Environment Variables
+
+| Variable                | Service   | Description                      | Example Value                                   |
+|-------------------------|-----------|----------------------------------|-------------------------------------------------|
+| `OPENAI_API_KEY`        | api       | OpenAI API authentication        | `sk-xxxxxxxxxxxxxxxxxx`                         |
+| `PGDATABASE_URL`        | api       | PostgreSQL database URL          | `postgresql://user:password@localhost:5432/dbname` |
+| `NEXT_PUBLIC_API_URL`   | frontend  | Frontend API base URL            | `http://localhost:8000`                         |
+
+Add the above variables in your `.env` file for the respective service.
+
 ### Docker development
 
 > **Note:** Assuming, that you have docker desktop installed in your system.
