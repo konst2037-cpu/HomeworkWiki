@@ -82,7 +82,7 @@ export default function HomeworkFilters({
             variant="outline"
             role="combobox"
             aria-expanded={openSchool}
-            className="w-full md:w-1/2 justify-between"
+            className="w-full md:min-w-1/2 md:max-w-fit justify-between"
           >
             {schoolName
               ? schools.find((sch) => sch.name === schoolName)?.name
@@ -135,7 +135,7 @@ export default function HomeworkFilters({
             variant="outline"
             role="combobox"
             aria-expanded={openGrade}
-            className="w-full md:w-1/2 justify-between"
+            className="w-full md:min-w-1/2 md:max-w-fit justify-between"
           >
             {gradeLevel ? `Grade ${gradeLevel}` : "Select Grade"}
             <ChevronsUpDown className="opacity-50 ml-2" />
@@ -182,7 +182,7 @@ export default function HomeworkFilters({
             variant="outline"
             role="combobox"
             aria-expanded={openClass}
-            className="w-full md:w-1/2 justify-between"
+            className="w-full md:min-w-1/2 md:max-w-fit justify-between"
           >
             {classSection
               ? `Class ${classes.find((c) => c.name === classSection)?.name}`
