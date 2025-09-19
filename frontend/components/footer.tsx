@@ -4,6 +4,7 @@ import React from "react";
 import { Badge } from "./ui/badge";
 import { useFilters } from "@/contexts/FilterContext";
 import Link from "next/link";
+import { translations } from "@/consts";
 
 const Footer: React.FC = () => {
   const { filters } = useFilters();
@@ -30,7 +31,7 @@ const Footer: React.FC = () => {
         </Link>
         <div className="flex gap-4 items-center justify-end">
           <span className="flex items-center gap-2">
-            <span className="font-medium">School:</span>
+            <span className="font-medium">{translations.School}:</span>
             <Badge
               variant="secondary"
               className="bg-blue-100 text-blue-800 border-blue-300"
@@ -39,7 +40,7 @@ const Footer: React.FC = () => {
             </Badge>
           </span>
           <span className="flex items-center gap-2">
-            <span className="font-medium">Class:</span>
+            <span className="font-medium">{translations.Class}</span>
             <Badge
               variant="secondary"
               className="bg-purple-100 text-purple-800 border-purple-300"

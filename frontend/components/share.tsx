@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Copy, Share } from "lucide-react";
 import { useFilters } from "@/contexts/FilterContext";
 import React from "react";
+import { translations } from "@/consts";
 
 export function ShareButton() {
   const { filters, setFilters } = useFilters();
@@ -60,25 +61,25 @@ export function ShareButton() {
         className="cursor-pointer my-2 flex items-center gap-2 border-blue-500 text-blue-700 hover:bg-blue-50 hover:border-blue-700 transition-all shadow-sm"
         onClick={() => {
           navigator.clipboard.writeText(shareUrl());
-          toast.info("Homework link copied!");
+          toast.info(translations.LinkCopied);
         }}
       >
         <Copy className="w-4 h-4" />
-        <span className="font-medium">Link</span>
+        <span className="font-medium">{translations.CopyLink}</span>
       </Button>
       <Button
         variant="outline"
         className="cursor-pointer my-2 flex items-center gap-2 border-blue-500 text-blue-700 hover:bg-blue-50 hover:border-blue-700 transition-all shadow-sm"
         onClick={() => {
           navigator.share?.({
-            title: "Homework Link",
-            text: "Check out this homework link!",
+            title: translations.HomeworkLink,
+            text: translations.CheckOutThisHomeworkLink,
             url: shareUrl(),
           });
         }}
       >
         <Share className="w-4 h-4" />
-        <span className="font-medium">Share</span>
+        <span className="font-medium">{translations.Share}</span>
       </Button>
     </div>
   );

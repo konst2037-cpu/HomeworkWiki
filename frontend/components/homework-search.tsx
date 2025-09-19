@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { useRouter } from "next/navigation";
 import { ShareButton } from "./share";
+import { translations } from "@/consts";
 
 type HomeworkCount = {
   delivery_date: string;
@@ -95,7 +96,7 @@ export default function HomeworkSearchPage() {
     <div className="flex flex-col items-center w-full px-2">
       <div className="grid grid-cols-7 gap-2 w-auto md:w-full md:max-w-4xl">
         {/* Weekday labels in the first row */}
-        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((weekday) => (
+        {translations.WeekDays.map((weekday) => (
           <div
             key={weekday}
             className="font-semibold text-center text-gray-500 py-1 text-xs md:text-sm"
@@ -120,7 +121,7 @@ export default function HomeworkSearchPage() {
 
             if (date < startDate || date > endDate) return null;
 
-            const dayLabel = date.toLocaleDateString("en-US", {
+            const dayLabel = date.toLocaleDateString("de-DE", {
               month: "short",
               day: "numeric",
             });

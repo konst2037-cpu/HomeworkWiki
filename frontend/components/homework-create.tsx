@@ -14,6 +14,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import React from "react";
 import { useFilters } from "@/contexts/FilterContext";
+import { translations } from "@/consts";
 
 export default function HomeworkCreatePage() {
   const [open, setOpen] = React.useState(false);
@@ -23,7 +24,7 @@ export default function HomeworkCreatePage() {
   const [content, setContent] = React.useState("");
   const [userId, setUserId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(
-    "All fields are required.",
+    translations.AllFieldsRequired,
   );
   const { filters } = useFilters();
   const [loading, setLoading] = React.useState(false);
@@ -46,11 +47,11 @@ export default function HomeworkCreatePage() {
   // Validation logic moved to useEffect to update error state reactively
   React.useEffect(() => {
     if (!deliveryDate) {
-      setError("Date is required.");
+      setError(translations.DateIsRequired);
     } else if (!subject.trim()) {
-      setError("Subject is required.");
+      setError(translations.SubjectIsRequired);
     } else if (!content.trim()) {
-      setError("Content is required.");
+      setError(translations.ContentIsRequired);
     } else {
       setError("");
     }
@@ -84,14 +85,12 @@ export default function HomeworkCreatePage() {
         if (res.status === 422) {
           res.json().then((data) => {
             console.log(data);
-            toast.error(
-              data?.detail || "Validation error. Please check your input.",
-            );
+            toast.error(data?.detail || translations.PleaseCheckSubjectContent);
           });
         } else if (res.ok) {
           window.location.href = `/homework/list/${deliveryDate}`;
         } else {
-          toast.error("Failed to create homework.");
+          toast.error(translations.FailedCreateHomework);
         }
       })
       .finally(() => {
@@ -102,7 +101,7 @@ export default function HomeworkCreatePage() {
   return (
     <div className="flex flex-col h-full items-center gap-10 px-4">
       <h2 className="scroll-m-20 border-b pb-2 text-xl md:text-2xl md:font-semibold tracking-tight first:mt-0">
-        Post Homework
+        {translations.PostHomework}
       </h2>
       <form
         className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl"
@@ -121,7 +120,9 @@ export default function HomeworkCreatePage() {
                   id="date"
                   className="w-full font-normal justify-between"
                 >
-                  {deliveryDate ? deliveryDate : "Select delivery date"}
+                  {deliveryDate
+                    ? deliveryDate
+                    : translations.SelectDeliveryDate}
                   <ChevronDownIcon className="ml-2" />
                 </Button>
               </PopoverTrigger>
@@ -155,7 +156,7 @@ export default function HomeworkCreatePage() {
           </div>
           <Input
             type="text"
-            placeholder="Subject"
+            placeholder={translations.Subject}
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             className="w-full"
@@ -164,7 +165,7 @@ export default function HomeworkCreatePage() {
         </div>
         <div className="flex flex-col md:col-span-2">
           <Textarea
-            placeholder="Enter homework details..."
+            placeholder={translations.EnterHomeworkDetails}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="w-full"
@@ -178,7 +179,7 @@ export default function HomeworkCreatePage() {
               style={{ cursor: "pointer" }}
               className="font-normal px-10 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
             >
-              Cancel
+              {translations.Cancel}
             </Button>
           </Link>
           <Button
@@ -187,7 +188,7 @@ export default function HomeworkCreatePage() {
             type="submit"
             style={{ cursor: "pointer" }}
           >
-            Submit
+            {translations.Submit}
           </Button>
           {loading && (
             <LoaderCircle className="animate-spin h-6 w-6 text-primary items-center" />

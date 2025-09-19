@@ -25,18 +25,11 @@ import {
 import { cn } from "@/lib/utils";
 import { ShareButton } from "./share";
 import { HomeworkActions } from "./homework-actions";
+import { translations } from "@/consts";
 
 function getDateFormatted(inputDate?: Date) {
   const date = inputDate ?? new Date();
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const days = translations.LongWeekDays;
   const dayName = days[date.getDay()];
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -108,7 +101,7 @@ export default function HomeworkListPage({ params }: ListPageProps) {
         setHomeworks(data);
       })
       .catch((err) => {
-        toast.error("Failed to fetch homeworks.");
+        toast.error(translations.FailedFetchHomeworks);
         console.error(err);
         setHomeworks([]);
       })
@@ -176,19 +169,21 @@ export default function HomeworkListPage({ params }: ListPageProps) {
           className="p-2 rounded-full hover:bg-slate-300 transition disabled:opacity-50"
           onClick={() => handleNavigate(prevDeliveryDate)}
           disabled={!prevDeliveryDate}
-          aria-label="Previous date"
+          aria-label={translations.PreviousDate}
           variant={"outline"}
         >
           <ArrowBigLeft className="w-6 h-6 text-slate-600" />
         </Button>
         <h3 className="md:text-2xl font-bold text-slate-800 tracking-tight">
-          {currentDate ? getDateFormatted(new Date(currentDate)) : "Loading..."}
+          {currentDate
+            ? getDateFormatted(new Date(currentDate))
+            : `${translations.Loading}`}
         </h3>
         <Button
           className="p-2 rounded-full hover:bg-slate-300 transition disabled:opacity-50"
           onClick={() => handleNavigate(nextDeliveryDate)}
           disabled={!nextDeliveryDate}
-          aria-label="Next date"
+          aria-label={translations.NextDate}
           variant={"outline"}
         >
           <ArrowBigRight className="w-6 h-6 text-slate-600" />
@@ -304,12 +299,12 @@ export default function HomeworkListPage({ params }: ListPageProps) {
               <span className="animate-[zoom_1s_ease-in-out_infinite]">
                 <Search />
               </span>
-              Lookup Homework
+              {translations.LookupHomework}
             </Button>
           </Link>
 
           <Button className="text-cyan-700 font-medium" variant={"outline"}>
-            Total:{" "}
+            {translations.Total}:{" "}
             <Badge className="bg-cyan-500 text-white">{homeworkCount}</Badge>
           </Button>
         </div>
@@ -331,8 +326,10 @@ export default function HomeworkListPage({ params }: ListPageProps) {
         <Table className="table-fixed w-full">
           <TableHeader className="sticky top-0 bg-white z-10">
             <TableRow>
-              <TableHead className="w-[12vw] max-w-[120px]">Subject</TableHead>
-              <TableHead className="w-[40vw]">Content</TableHead>
+              <TableHead className="w-[12vw] max-w-[120px]">
+                {translations.Subject}
+              </TableHead>
+              <TableHead className="w-[40vw]">{translations.Content}</TableHead>
               <TableHead className="text-right w-[7vw] max-w-[120px]"></TableHead>
             </TableRow>
           </TableHeader>

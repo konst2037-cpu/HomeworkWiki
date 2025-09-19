@@ -8,6 +8,7 @@ import HomeworkFilters from "./homework-filters";
 import { ClassChar, GradeLevel, School } from "@/types";
 import { Plus, Search } from "lucide-react";
 import { useFilters } from "@/contexts/FilterContext";
+import { translations } from "@/consts";
 
 export default function Home() {
   const [schools, setSchools] = React.useState<School[]>([]);
@@ -53,7 +54,7 @@ export default function Home() {
         localStorage.setItem("cached_schools", JSON.stringify(data));
       } catch (error) {
         console.error(error);
-        toast.error("Could not load schools");
+        toast.error(translations.CouldNotLoadSchools);
       }
     }
     // Only fetch if not cached
@@ -76,7 +77,7 @@ export default function Home() {
         localStorage.setItem("cached_grades", JSON.stringify(data));
       } catch (error) {
         console.error(error);
-        toast.error("Could not load grades");
+        toast.error(translations.CouldNotLoadGrades);
       }
     }
     const cachedGrades = localStorage.getItem("cached_grades");
@@ -98,7 +99,7 @@ export default function Home() {
         localStorage.setItem("cached_classes", JSON.stringify(data));
       } catch (error) {
         console.error(error);
-        toast.error("Could not load classes");
+        toast.error(translations.CouldNotLoadClasses);
       }
     }
 
@@ -146,7 +147,7 @@ export default function Home() {
           schools={schools}
           setSchools={setSchools}
         />
-        <div className="flex flex-col md:flex-row gap-2 w-full md:w-1/3 items-center mt-3">
+        <div className="flex flex-col md:flex-row gap-2 w-full md:w-1/3 items-center mt-3 justify-center">
           {isFiltered ? (
             <>
               <Link href="/homework/create" className="w-full md:w-fit">
@@ -156,7 +157,7 @@ export default function Home() {
                   style={{ cursor: "pointer" }}
                 >
                   <Plus />
-                  Post Homework
+                  {translations.PostHomework}
                 </Button>
               </Link>
               <Link href="/homework/lookup" className="w-full md:w-fit">
@@ -168,7 +169,7 @@ export default function Home() {
                   <span className="animate-[zoom_1s_ease-in-out_infinite]">
                     <Search />
                   </span>
-                  Lookup Homework
+                  {translations.LookupHomework}
                 </Button>
               </Link>
             </>
@@ -177,28 +178,20 @@ export default function Home() {
               <Button
                 variant="default"
                 className="w-full md:w-fit py-4 bg-indigo-500 text-white font-semibold shadow transition-all duration-200 hover:bg-indigo-600 flex items-center gap-2"
-                onClick={() =>
-                  toast.error(
-                    "Please select school, grade and class to post homework.",
-                  )
-                }
+                onClick={() => toast.error(translations.SelectSchoolGradeClass)}
               >
                 <Plus />
-                Post Homework
+                {translations.PostHomework}
               </Button>
               <Button
                 variant="default"
                 className="w-full md:w-fit py-4 bg-cyan-500 text-white font-semibold shadow transition-all duration-200 hover:bg-cyan-600 flex items-center gap-2"
-                onClick={() =>
-                  toast.error(
-                    "Please select school, grade and class to lookup homework.",
-                  )
-                }
+                onClick={() => toast.error(translations.SelectSchoolGradeClass)}
               >
                 <span>
                   <Search />
                 </span>
-                Lookup Homework
+                {translations.LookupHomework}
               </Button>
             </>
           )}

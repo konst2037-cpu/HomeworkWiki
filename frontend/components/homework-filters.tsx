@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 // import { gradeLevels, classChar } from "@/consts";
 import { ClassChar, GradeLevel, School } from "@/types";
 import { useFilters } from "@/contexts/FilterContext";
+import { translations } from "@/consts";
 
 interface HomeworkFiltersProps {
   schools: School[];
@@ -110,21 +111,21 @@ export default function HomeworkFilters({
             aria-expanded={openSchool}
             className="w-full md:min-w-1/2 md:max-w-fit justify-between"
           >
-            {schoolName || "Select School"}
+            {schoolName || translations.SelectSchool}
             <ChevronsUpDown className="opacity-50 ml-2" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full sm:w-[220px] md:w-[240px] p-0">
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search school..."
+              placeholder={translations.SearchSchool}
               className="h-9"
               required
               onValueChange={searchSchools}
             />
             <CommandList>
               <CommandEmpty>
-                {loading ? "Loading..." : "No schools found."}
+                {loading ? translations.Loading : translations.NoSchoolsFound}
               </CommandEmpty>
               <CommandGroup>
                 {schools?.map((sch) => (
@@ -164,15 +165,20 @@ export default function HomeworkFilters({
             aria-expanded={openGrade}
             className="w-full md:min-w-1/2 md:max-w-fit justify-between"
           >
-            {gradeLevel ? `Grade ${gradeLevel}` : "Select Grade"}
+            {gradeLevel
+              ? `${translations.Grade} ${gradeLevel}`
+              : translations.SelectGrade}
             <ChevronsUpDown className="opacity-50 ml-2" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full sm:w-[180px] md:w-[200px] p-0">
           <Command>
-            <CommandInput placeholder="Search grade..." className="h-9" />
+            <CommandInput
+              placeholder={translations.SearchGrade}
+              className="h-9"
+            />
             <CommandList>
-              <CommandEmpty>No grade found.</CommandEmpty>
+              <CommandEmpty>{translations.NoGradesFound}</CommandEmpty>
               <CommandGroup>
                 {grades?.map((grade) => (
                   <CommandItem
@@ -187,7 +193,7 @@ export default function HomeworkFilters({
                       setOpenGrade(false);
                     }}
                   >
-                    {`Grade ${grade.name}`}
+                    {`${translations.Grade} ${grade.name}`}
                     <Check
                       className={cn(
                         "ml-auto",
@@ -212,16 +218,19 @@ export default function HomeworkFilters({
             className="w-full md:min-w-1/2 md:max-w-fit justify-between"
           >
             {classSection
-              ? `Class ${classes.find((c) => c.name === classSection)?.name}`
-              : "Select Class"}
+              ? `${translations.Class} ${classes.find((c) => c.name === classSection)?.name}`
+              : translations.SelectClass}
             <ChevronsUpDown className="opacity-50 ml-2" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full sm:w-[140px] md:w-[160px] p-0">
           <Command>
-            <CommandInput placeholder="Search class..." className="h-9" />
+            <CommandInput
+              placeholder={translations.SearchClass}
+              className="h-9"
+            />
             <CommandList>
-              <CommandEmpty>No class found.</CommandEmpty>
+              <CommandEmpty>{translations.NoClassesFound}</CommandEmpty>
               <CommandGroup>
                 {classes?.map((section) => (
                   <CommandItem
@@ -238,7 +247,7 @@ export default function HomeworkFilters({
                       setClassId(section.id);
                     }}
                   >
-                    {`Class ${section.name}`}
+                    {`${translations.Class} ${section.name}`}
                     <Check
                       className={cn(
                         "ml-auto",
